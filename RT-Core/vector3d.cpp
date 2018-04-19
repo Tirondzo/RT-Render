@@ -1,30 +1,13 @@
+#include "vector3d.h"
+#include <cmath>
 
-double Vector3D::getX() const
+
+NVector<double, 3> Vector3D::normalize() const
 {
-    return x;
+    return (*this) / this->length();
 }
 
-void Vector3D::setX(double value)
+double Vector3D::length() const
 {
-    x = value;
-}
-
-double Vector3D::getY() const
-{
-    return y;
-}
-
-void Vector3D::setY(double value)
-{
-    y = value;
-}
-
-double Vector3D::getZ() const
-{
-    return z;
-}
-
-void Vector3D::setZ(double value)
-{
-    z = value;
+    return sqrt(data[0]*data[0] + data[1]*data[1] + data[2]*data[2]);
 }

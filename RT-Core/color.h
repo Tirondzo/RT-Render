@@ -1,8 +1,9 @@
 #ifndef COLOR_H
 #define COLOR_H
 
+#include "nvector.h"
 
-class Color
+class Color : public NVector<int, 4>
 {
 public:
     static const Color RED;
@@ -10,28 +11,17 @@ public:
     static const Color BLUE;
     static const Color WHITE;
 
-    Color(int r, int g, int b, int a = 255);
+    Color(int r, int g, int b, int a = 255) : NVector<int, 4>(r,g,b,a) { }
+    Color(NVector<int, 4> v) : NVector<int, 4>(v){}
 
-    Color operator * (double s);
-    Color & operator *= (const double s);
-
-    Color operator * (const Color &c);
-    Color & operator *= (const Color &c);
-
-    Color operator + (const Color &c);
-    Color & operator += (const Color &c);
-
-    Color operator / (double s);
-    Color & operator /= (const double s);
-
-    int getR() const;
-    Color& setR(int value);
-    int getG() const;
-    Color& setG(int value);
-    int getB() const;
-    Color& setB(int value);
-    int getA() const;
-    Color& setA(int value);
+    double getR() const { return data[0]; }
+    Color& setR(double value) { data[0] = value; return *this; }
+    double getG() const { return data[1]; }
+    Color& setG(double value) { data[1] = value; return *this; }
+    double getB() const { return data[2]; }
+    Color& setB(double value) { data[2] = value; return *this; }
+    double getA() const { return data[3]; }
+    Color& setA(double value) { data[3] = value; return *this; }
 };
 
 #endif // COLOR_H

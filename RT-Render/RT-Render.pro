@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,14 +24,30 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 DEPENDPATH += . ../RT-Core/
 INCLUDEPATH += ../RT-Core/
-LIBS += -L../RT-Core/debug -lrt-core
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    graphicsview.cpp \
+    render.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    graphicsview.h \
+    render.h
 
 FORMS += \
         mainwindow.ui
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../RT-Core/release/ -lRT-Core
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../RT-Core/debug/ -lRT-Core
+else:unix: LIBS += -L$$OUT_PWD/../RT-Core/ -lRT-Core
+
+INCLUDEPATH += $$PWD/../RT-Core
+DEPENDPATH += $$PWD/../RT-Core
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../RT-Core/release/libRT-Core.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../RT-Core/debug/libRT-Core.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../RT-Core/release/RT-Core.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../RT-Core/debug/RT-Core.lib
+else:unix: PRE_TARGETDEPS += $$OUT_PWD/../RT-Core/libRT-Core.a

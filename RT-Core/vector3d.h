@@ -1,45 +1,25 @@
 #ifndef VECTOR3D_H
 #define VECTOR3D_H
 
-class Vector3D {
-    double x, y, z;
+#include "nvector.h"
+
+class Vector3D : public NVector<double, 3>{
 public:
-    Vector3D(double x=0, double y=0, double z=0);
-    Vector3D(double val);
 
-    Vector3D normalize();
+    Vector3D(NVector<double, 3> v) : NVector<double, 3>(v) {}
+    Vector3D() : NVector<double, 3>() {}
+    Vector3D(double x, double y, double z) : NVector<double, 3>(x,y,z){}
 
-    Vector3D cross(Vector3D const &v) const;
-
-    double dot(Vector3D const &v) const;
-
+    NVector<double,3> normalize() const;
     double length() const;
 
-    Vector3D operator + (Vector3D const &v) const;
-    Vector3D& operator += (Vector3D const &v);
-
-    Vector3D operator - (Vector3D const & v) const;
-    Vector3D& operator -= (Vector3D const & v);
-
-    Vector3D operator * (Vector3D const & v) const;
-    Vector3D& operator *= (Vector3D const & v);
-
-    Vector3D operator * (double const s) const;
-    Vector3D& operator *= (double const s);
-
-    Vector3D operator / (Vector3D const & v) const;
-    Vector3D& operator /= (Vector3D const & v);
-
-    Vector3D operator / (double const s) const;
-    Vector3D& operator /= (double const s);
-
-    double getX() const { return x; }
-    Vector3D& setX(double value) { x = value; return *this; }
-    double getY() const { return y; }
-    Vector3D& setY(double value) { y = value; return *this; }
-    double getZ() const { return z; }
-    Vector3D& setZ(double value) { z = value; return *this; }
-}
+    double getX() const { return data[0]; }
+    Vector3D& setX(double value) { data[0] = value; return *this; }
+    double getY() const { return data[1]; }
+    Vector3D& setY(double value) { data[1] = value; return *this; }
+    double getZ() const { return data[2]; }
+    Vector3D& setZ(double value) { data[2] = value; return *this; }
+};
 
 
 #endif // VECTOR3D_H

@@ -2,6 +2,7 @@
 #define NVECTOR_H
 
 #include <cstddef>
+#include <cmath>
 
 template <typename T, const std::size_t N>
 class NVector
@@ -16,7 +17,7 @@ public:
 
     typedef class NVector<T,N> this_type;
     typedef T value_type;
-    inline static int size(void) { return len; }
+    inline static int size(void) { return N; }
 
     inline T& operator [] (std::size_t index){
         return data[index];
@@ -39,7 +40,7 @@ public:
     inline virtual this_type operator - (this_type const & v) const{
         this_type new_one;
         for(int i = 0; i < N; i++){
-            new_one.data[i] = data[i] + v.data[i];
+            new_one.data[i] = data[i] - v.data[i];
         }
         return new_one;
     }
@@ -49,7 +50,6 @@ public:
         }
         return *this;
     }
-
     inline virtual this_type operator * (this_type const & v) const{
         this_type new_one;
         for(int i = 0; i < N; i++){
@@ -79,7 +79,7 @@ public:
     }
 
     template <typename Scalar>
-    inline virtual this_type operator * (Scalar const &s) const{
+    inline this_type operator* (Scalar const &s) const{
         this_type new_one;
         for(int i = 0; i < N; i++){
             new_one.data[i] = data[i] * s;
@@ -87,7 +87,7 @@ public:
         return new_one;
     }
     template <typename Scalar>
-    inline virtual this_type& operator *= (Scalar const &s){
+    inline this_type& operator *= (Scalar const &s){
         for(int i = 0; i < N; i++){
             data[i] *= s;
         }
@@ -95,7 +95,7 @@ public:
     }
 
     template <typename Scalar>
-    inline virtual this_type operator / (Scalar const &s) const{
+    inline this_type operator / (Scalar const &s) const{
         this_type new_one;
         for(int i = 0; i < N; i++){
             new_one.data[i] = data[i] / s;
@@ -103,7 +103,7 @@ public:
         return new_one;
     }
     template <typename Scalar>
-    inline virtual this_type& operator /= (Scalar const &s){
+    inline this_type& operator /= (Scalar const &s){
         for(int i = 0; i < N; i++){
             data[i] /= s;
         }
@@ -111,7 +111,7 @@ public:
     }
 
 
-    inline virtual T dot(const this_type &v) const{
+    inline virtual T dot(const this_type &v){
         T res{};
         for(int i = 0; i < N; i++){
             res += data[i] * v.data[i];
@@ -119,9 +119,37 @@ public:
         return res;
     }
 
-    inline virtual T cross(const this_type &v) const;
-    inline virtual T length() const;
-    inline virtual this_type normalize();
+    static inline T dot(const this_type &a, const this_type &b){
+        T res{};
+        for(int i = 0; i < N; i++){
+            res += a.data[i] * b.data[i];
+        }
+        return res;
+    }
+
+    static inline NVector<T,3> cross(const NVector<T,3>& a, const NVector<T,3>& b)
+    {
+        return NVector<T,3>(a.data[1] * b.data[2] - b.data[1] * a.data[2],
+                        a.data[2] * b.data[0] - b.data[2] * a.data[0],
+                        a.data[0] * b.data[1] - b.data[0] * a.data[1]);
+    }
+
+    virtual NVector<T,N> normalize() const{
+        T len;
+        for(int i = 0; i < N; i++){
+            len += data[i] * data[i];
+        }
+        return NVector<T,N>(*this)/sqrt(len);
+    }
+
+    virtual T length() const{
+        T len;
+        for(int i = 0; i < N; i++){
+            len += data[i] * data[i];
+        }
+        return sqrt(len);
+    }
 };
+
 
 #endif // NVECTOR_H
