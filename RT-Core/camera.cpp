@@ -16,22 +16,22 @@ Camera::Camera(Vector3D position, Vector3D lookAt, float fov, float focus, float
 }
 
 
-Vector3D Camera::getLookAt() const
+Vector3D& Camera::getLookAt()
 {
     return lookAt;
 }
 
-Vector3D Camera::getUp() const
+Vector3D& Camera::getUp()
 {
     return up;
 }
 
-Vector3D Camera::getRight() const
+Vector3D& Camera::getRight()
 {
     return right;
 }
 
-Vector3D Camera::getPosition() const
+Vector3D& Camera::getPosition()
 {
     return position;
 }

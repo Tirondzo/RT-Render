@@ -30,7 +30,6 @@ SOURCES += \
     object.cpp \
     intersection.cpp \
     material.cpp \
-    random.cpp \
     plane.cpp \
     sphere.cpp \
     camera.cpp
@@ -45,7 +44,6 @@ HEADERS += \
     object.h \
     intersection.h \
     material.h \
-    random.h \
     plane.h \
     sphere.h \
     camera.h

@@ -10,7 +10,7 @@ private:
     float radius;
 
 public:
-    Sphere(const Material &material, Vector3D center, float radius);
+    Sphere(Material *material, Vector3D center, float radius);
 
     Intersection intersect(const Ray &ray);
 };

@@ -1,6 +1,5 @@
 #include "render.h"
 #include "integrator.h"
-#include "random.h"
 
 #include <QThread>
 #include <QDebug>
@@ -24,37 +23,24 @@ Render::~Render()
 }
 
 
-QImage *Render::startRender(const Scene &scene, const Camera &camera, int _width, int _height, int threads)
+QImage *Render::startRender(Scene *scene, Camera *camera, int width, int height, int threads)
 {
     //if(image != nullptr)
         //delete [] image;
 
     //mutex.lock();
 
-    width = _width;
-    height = _height;
+    this->width = width;
+    this->height = height;
     image = new QImage(width, height, QImage::Format::Format_RGB888);
 
-    Scene * _scene = new Scene(scene);
-    Camera * _camera = new Camera(camera);
 
     activeThreads = threads;
-
-
-    /*for(int i = 0; i < threads; i++){
-        QThread* thread = new QThread;
-        //moveToThread(thread);
-        connect(thread, SIGNAL(started()), this, SLOT(process()));
-        //connect(this, SIGNAL(finished()), thread, SLOT(quit()));
-        connect(this, SIGNAL(stopAll()), thread, SLOT(quit()));
-        //connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-        thread->start();
-    }*/
 
     RenderImpl::Counter *counter = new RenderImpl::Counter(width, height, -1, 0);
 
     for(int i = 0; i < threads; i++){
-        RenderImpl::Worker *thrd = new RenderImpl::Worker(this, counter, _camera, _scene);
+        RenderImpl::Worker *thrd = new RenderImpl::Worker(this, counter, camera, scene);
         connect(thrd, SIGNAL(finished()), this, SLOT(finishedOne()));
         connect(thrd, SIGNAL(finished()), thrd, SLOT(deleteLater()));
         thrd->start();
@@ -108,7 +94,7 @@ void RenderImpl::Worker::run(){
        //img->setPixelColor(x,height-1-y, QColor(250,120,20));
        //QTest::qSleep(10);
        //continue;
-       int ns = 32;
+       int ns = 512;
        int r = 0, g = 0, b = 0, a = 0;
 
        for (int s = 0; s < ns; ++s) {
@@ -118,18 +104,29 @@ void RenderImpl::Worker::run(){
            double dx = (double)rand() / RAND_MAX;
            double dy = (double)rand() / RAND_MAX;
 
-
            Vector3D xShift = camera->getRight() * (x - width/2.0 + dx) / width * camera->getFov();
-           Vector3D yShift = camera->getUp() * ((y - height/2.0 + dy) / width * camera->getFov());
+           Vector3D yShift = camera->getUp() * ((y - height/2.0 + dy) / height * camera->getFov());
 
            Ray ray(camera->getPosition(), camera->getLookAt() + xShift + yShift - camera->getPosition());
 
-           Color color = Integrator::trace(*scene, ray, 6, 0);
+           Color color = Integrator::trace(scene, ray, 6, 0);
 
            r += color.getR();
            g += color.getG();
            b += color.getB();
            a += color.getA();
+
+           /*
+           r += ray.getDirection().getX() * 120 + 128;
+           g += ray.getDirection().getY() * 120 + 128;
+           b += ray.getDirection().getZ() * 120 + 128;
+           */
+
+           /*r += camera->getRight().getX() * 120 + 128;
+           g += camera->getRight().getY() * 120 + 128;
+           b += camera->getRight().getZ() * 120 + 128;*/
+
+           a += 255;
        }
 
        img->setPixelColor(x,height-1-y, QColor(r/ns,g/ns,b/ns));

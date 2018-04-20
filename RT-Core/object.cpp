@@ -1,17 +1,17 @@
 #include "object.h"
 
 
-Object::Object(const Material material) : material(material)
+Object::Object(Material *material) : material(material)
 {
 
 }
 
-Material Object::getMaterial() const
+Material* Object::getMaterial() const
 {
     return material;
 }
 
-void Object::setMaterial(const Material &value)
+void Object::setMaterial(Material *value)
 {
     material = value;
 }

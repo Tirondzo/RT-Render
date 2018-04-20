@@ -10,15 +10,15 @@ class Intersection;
 class Object
 {
 protected:
-    Material material;
+    Material *material;
 
 public:
-    Object(const Material material);
+    Object(Material *material);
 
     virtual Intersection intersect(const Ray &ray) = 0;
 
-    Material getMaterial() const;
-    void setMaterial(const Material &value);
+    Material* getMaterial() const;
+    void setMaterial(Material *value);
 };
 
 #endif // OBJECT_H

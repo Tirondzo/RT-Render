@@ -1,8 +1,9 @@
 #include "material.h"
-#include "random.h"
 
 #define _USE_MATH_DEFINES
 #include <cmath>
+
+#include <cstdlib>
 
 
 const float EPSILON = 1e-4;
@@ -44,12 +45,15 @@ double Material::getCoef(const Intersection &intersection, const Ray &ray, const
     return 1.f;
 }
 
-Ray Material::getNewRay(const Intersection &intersection, const Ray &ray, float rand) const
+Ray Material::getNewRay(const Intersection &intersection, const Ray &ray, float rand_k) const
 {
     Vector3D N = intersection.getNormal();
-    if(rand < kd){ //diffusive
-        double r1 = random::randd();
-        double r2 = random::randd();
+    if(rand_k < kd){ //diffusive
+        //double r1 = random::randd();
+        //double r2 = random::randd();
+        double r1 = (double)rand() / RAND_MAX;
+        double r2 = (double)rand() / RAND_MAX;
+
         double phi = 2 * M_PI * r1;
         double cosTheta = sqrt(1-r2);
         double sinTheta = sqrt(1 - pow(cosTheta, 2));
@@ -79,7 +83,7 @@ Ray Material::getNewRay(const Intersection &intersection, const Ray &ray, float 
         return Ray(intersection.getPoint() + intersection.getNormal() * EPSILON, direction);
         */
 
-    }else if(rand < kd + ks){ //specullar
+    }else if(rand_k < kd + ks){ //specullar
         Vector3D direction = ray.getDirection() - N * 2 * Vector3D::dot(ray.getDirection(), N);
         return Ray(intersection.getPoint() + intersection.getNormal() * EPSILON, direction);
     }else{ //transmittion

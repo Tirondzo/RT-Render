@@ -1,7 +1,7 @@
 #include "sphere.h"
 #include <math.h>
 
-Sphere::Sphere(const Material &material, Vector3D center, float radius) :
+Sphere::Sphere(Material *material, Vector3D center, float radius) :
     Object(material), center(center), radius(radius)
 {
 

@@ -31,7 +31,7 @@ public:
         color(color),
         kd(kd), ks(ks), kt(kt),
         reflectivity(reflectivity),
-        shiness(shininess) {}
+        shiness(shininess), isLight(false) {}
 
     float getReflectivity() const;
     float getShiness() const;

@@ -14,7 +14,7 @@ class Scene
     std::vector<Object *> objects;
 
 public:
-    Scene(Color ambient = Color(0,0,0), float gamma = .1f) : ambient(ambient), gamma(gamma) {}
+    Scene(Color ambient = Color(0,0,0), float gamma = .1f) : ambient(ambient), gamma(gamma), objects() {}
     Color getAmbient() const;
     void setAmbient(const Color &value);
     float getGamma() const;

@@ -1,7 +1,7 @@
 #include "plane.h"
-#include <math.h>
+#include <cmath>
 
-Plane::Plane(const Material &material, Vector3D center, Vector3D normal) :
+Plane::Plane(Material *material, Vector3D center, Vector3D normal) :
     Object(material), center(center), normal(normal)
 {
 

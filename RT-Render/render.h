@@ -20,7 +20,7 @@ public:
     Render();
     ~Render();
 
-    QImage* startRender(const Scene &scene, const Camera &camera, int width, int height, int threads = 1);
+    QImage* startRender(Scene *scene, Camera *camera, int width, int height, int threads = 1);
     QImage *getImage() const;
 
 private:

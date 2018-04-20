@@ -24,7 +24,7 @@ public:
     }
 
     inline virtual this_type operator + (this_type const &v) const{
-        this_type new_one;
+        this_type new_one{};
         for(int i = 0; i < N; i++){
             new_one.data[i] = data[i] + v.data[i];
         }
@@ -38,7 +38,7 @@ public:
     }
 
     inline virtual this_type operator - (this_type const & v) const{
-        this_type new_one;
+        this_type new_one{};
         for(int i = 0; i < N; i++){
             new_one.data[i] = data[i] - v.data[i];
         }
@@ -51,7 +51,7 @@ public:
         return *this;
     }
     inline virtual this_type operator * (this_type const & v) const{
-        this_type new_one;
+        this_type new_one{};
         for(int i = 0; i < N; i++){
             new_one.data[i] = data[i] * v.data[i];
         }
@@ -65,7 +65,7 @@ public:
     }
 
     inline virtual this_type operator / (this_type const & v) const{
-        this_type new_one;
+        this_type new_one{};
         for(int i = 0; i < N; i++){
             new_one.data[i] = data[i] / v.data[i];
         }
@@ -80,7 +80,7 @@ public:
 
     template <typename Scalar>
     inline this_type operator* (Scalar const &s) const{
-        this_type new_one;
+        this_type new_one{};
         for(int i = 0; i < N; i++){
             new_one.data[i] = data[i] * s;
         }
@@ -96,7 +96,7 @@ public:
 
     template <typename Scalar>
     inline this_type operator / (Scalar const &s) const{
-        this_type new_one;
+        this_type new_one{};
         for(int i = 0; i < N; i++){
             new_one.data[i] = data[i] / s;
         }
@@ -134,16 +134,17 @@ public:
                         a.data[0] * b.data[1] - b.data[0] * a.data[1]);
     }
 
-    virtual NVector<T,N> normalize() const{
-        T len;
+    virtual inline this_type normalize() const{
+        T len{};
+        this_type new_one(*this);
         for(int i = 0; i < N; i++){
             len += data[i] * data[i];
         }
-        return NVector<T,N>(*this)/sqrt(len);
+        return new_one/sqrt(len);
     }
 
-    virtual T length() const{
-        T len;
+    virtual inline T length() const{
+        T len{};
         for(int i = 0; i < N; i++){
             len += data[i] * data[i];
         }

@@ -20,10 +20,10 @@ private:
 public:
     Camera(Vector3D position, Vector3D lookAt, float fov = 10.0f, float focus = 3.8f, float focal = 7.5f);
 
-    Vector3D getPosition() const;
-    Vector3D getLookAt() const;
-    Vector3D getUp() const;
-    Vector3D getRight() const;
+    Vector3D& getPosition();
+    Vector3D& getLookAt();
+    Vector3D& getUp();
+    Vector3D& getRight();
     float getFov() const;
 };
 

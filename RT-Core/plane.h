@@ -9,7 +9,7 @@ private:
     Vector3D center, normal;
 
 public:
-    Plane(const Material &material, Vector3D center, Vector3D normal);
+    Plane(Material *material, Vector3D center, Vector3D normal);
 
     Intersection intersect(const Ray &ray);
 };
