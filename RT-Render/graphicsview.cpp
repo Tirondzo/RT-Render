@@ -4,8 +4,6 @@
 #include <QPixmap>
 #include <QPainter>
 
-QTimer *timer;
-QGraphicsScene *scn;
 
 GraphicsView::GraphicsView(QWidget *parent) : QGraphicsView(parent)
 {
@@ -15,7 +13,7 @@ GraphicsView::GraphicsView(QWidget *parent) : QGraphicsView(parent)
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateImage()));
-    timer->start(10);
+    timer->start(1000);
 }
 
 
@@ -37,13 +35,31 @@ QImage *GraphicsView::getImage() const
 void GraphicsView::setImage(QImage *value)
 {
     image = value;
+
+    scn->clear();
+
+    QGraphicsItem *item = new MyImage(image);
+    scn->addItem(item);
+    this->fitInView(scn->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 
 void GraphicsView::updateImage(){
     if(!image) return;
-    scn->clear();
-    scn->addPixmap(QPixmap::fromImage(*image));
-    QPainter p; p.drawImage();
+    //scn->clear();
+    //scn->addPixmap(QPixmap::fromImage(*image));
+    //painter->drawImage(0,0,*image);
+    //scn->drawBackground(painter, QRectF(0,0,512,512));
+    //scn->update();
     this->fitInView(scn->itemsBoundingRect(), Qt::KeepAspectRatio);
+}
+
+QRectF MyImage::boundingRect() const
+{
+    return QRectF(0,0,img->width(),img->height());
+}
+
+void MyImage::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    painter->drawImage(0,0,*img);
 }

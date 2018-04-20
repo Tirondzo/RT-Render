@@ -10,7 +10,7 @@
 
 #include <QTest>
 
-class Render : public QObject, QSharedData
+class Render : public QObject
 {
     Q_OBJECT
 

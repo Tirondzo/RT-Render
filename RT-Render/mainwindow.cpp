@@ -43,7 +43,23 @@ void MainWindow::on_pushButton_clicked()
     scene.addObject(new Sphere(redMat, Vector3D(8.5, 2.2, 0.5), 0.5f));
     scene.addObject(new Sphere(yellowMat, Vector3D(4.6, 2.15, 0.9), 0.9f));
 
-    Render render;
-    QImage* img = render.startRender(scene, camera, 512, 512, 4);
+    Render *render = new Render();
+    connect(render, SIGNAL(finished()), this, SLOT(render_finished()));
+    timer.start();
+    width = 512;
+    height = 512;
+    threads = 4;
+    QImage* img = render->startRender(scene, camera, width, height, threads);
     ui->graphicsView->setImage(img);
 }
+
+void MainWindow::render_finished()
+{
+    int ms = timer.elapsed();
+    QString message = "T";
+    statusBar()->showMessage("Render image " + QString::number(width) + "x" + QString::number(height) +
+                             " via " + QString::number(threads) + " threds, finished in: " +
+                             QString::number(ms) + "ms");
+}
+
+

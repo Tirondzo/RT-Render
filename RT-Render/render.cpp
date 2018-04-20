@@ -3,7 +3,7 @@
 #include "random.h"
 
 #include <QThread>
-
+#include <QDebug>
 
 
 
@@ -55,6 +55,8 @@ QImage *Render::startRender(const Scene &scene, const Camera &camera, int _width
 
     for(int i = 0; i < threads; i++){
         RenderImpl::Worker *thrd = new RenderImpl::Worker(this, counter, _camera, _scene);
+        connect(thrd, SIGNAL(finished()), this, SLOT(finishedOne()));
+        connect(thrd, SIGNAL(finished()), thrd, SLOT(deleteLater()));
         thrd->start();
         thrd->setPriority(QThread::HighestPriority);
     }
@@ -77,17 +79,20 @@ void Render::finishedOne()
 
 
 bool RenderImpl::Counter::getNextPixel(int *rx, int *ry){
-    QMutexLocker ml(&mutex);
+    //QMutexLocker ml(&mutex);
+    mutex.lock();
     x++;
     if(x >= width){
         x = 0;
         y++;
     }
     if(y >= height){
+        mutex.unlock();
         return false;
     }
 
     *rx = x; *ry = y;
+    mutex.unlock();
     return true;
 }
 
@@ -98,10 +103,12 @@ void RenderImpl::Worker::run(){
 
     int x,y;
     while(counter->getNextPixel(&x, &y)){
+        //qDebug() << x << " " << y << QThread::currentThread();
+
        //img->setPixelColor(x,height-1-y, QColor(250,120,20));
        //QTest::qSleep(10);
        //continue;
-       int ns = 8;
+       int ns = 32;
        int r = 0, g = 0, b = 0, a = 0;
 
        for (int s = 0; s < ns; ++s) {
