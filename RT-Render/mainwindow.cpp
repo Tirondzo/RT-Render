@@ -44,6 +44,6 @@ void MainWindow::on_pushButton_clicked()
     scene.addObject(new Sphere(yellowMat, Vector3D(4.6, 2.15, 0.9), 0.9f));
 
     Render render;
-    QImage* img = render.startRender(scene, camera, 512, 512, 1);
+    QImage* img = render.startRender(scene, camera, 512, 512, 4);
     ui->graphicsView->setImage(img);
 }

@@ -2,6 +2,7 @@
 
 #include <QTimer>
 #include <QPixmap>
+#include <QPainter>
 
 QTimer *timer;
 QGraphicsScene *scn;
@@ -14,7 +15,7 @@ GraphicsView::GraphicsView(QWidget *parent) : QGraphicsView(parent)
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateImage()));
-    timer->start(200);
+    timer->start(10);
 }
 
 
@@ -43,5 +44,6 @@ void GraphicsView::updateImage(){
     if(!image) return;
     scn->clear();
     scn->addPixmap(QPixmap::fromImage(*image));
+    QPainter p; p.drawImage();
     this->fitInView(scn->itemsBoundingRect(), Qt::KeepAspectRatio);
 }

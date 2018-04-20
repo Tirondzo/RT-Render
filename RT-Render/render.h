@@ -8,6 +8,8 @@
 #include <QThread>
 #include <QSharedData>
 
+#include <QTest>
+
 class Render : public QObject, QSharedData
 {
     Q_OBJECT
@@ -19,21 +21,17 @@ public:
     ~Render();
 
     QImage* startRender(const Scene &scene, const Camera &camera, int width, int height, int threads = 1);
-
     QImage *getImage() const;
-    bool nextPixel(int *ret_x, int *ret_y);
 
 private:
     void stopThreads();
     mutable QMutex mutex;
-    int x;
-    int y;
+
     int activeThreads;
 
     int width, height;
 
 public slots:
-    void process();
     void finishedOne();
 
 signals:
@@ -42,22 +40,37 @@ signals:
 };
 
 
-class Worker : public QObject{
+namespace RenderImpl {
+class Counter{
+    int width;
+    int height;
+    int x,y;
+    mutable QMutex mutex;
+    Q_DISABLE_COPY(Counter)
+
+public:
+    Counter(int w, int h, int x = 0, int y = 0) : width(w), height(h), x(x), y(y), mutex(){}
+
+    bool getNextPixel(int *rx, int *ry);
+};
+
+
+class Worker : public QThread{
     Q_OBJECT
 
+    Counter *counter;
     Render *render;
-    Camera *_camera;
-    Scene *_scene;
-    QMutex *mutex;
-public:
-    Worker(Render *render, QMutex *mutex, Camera *camera, Scene *scene) : render(render), mutex(mutex), _camera(camera), _scene(scene){
+    Camera *camera;
+    Scene *scene;
 
-    }
-public slots:
-    void doWork();
-signals:
-    void finished();
-private:
+public:
+    Worker(Render* render, Counter *cnt, Camera *cam, Scene *scn) :
+        render(render), counter(cnt), camera(cam), scene(scn) {}
+protected:
+    virtual void run();
+
 };
+
+}
 
 #endif // RENDER_H
