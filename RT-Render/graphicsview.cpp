@@ -11,6 +11,13 @@ GraphicsView::GraphicsView(QWidget *parent) : QGraphicsView(parent)
     scn = new QGraphicsScene(this);
     setScene(scn);
 
+    this->setCacheMode(CacheNone);
+    this->optimizationFlags().setFlag(DontSavePainterState, true);
+    this->optimizationFlags().setFlag(DontAdjustForAntialiasing, false);
+    this->setViewportUpdateMode(FullViewportUpdate);
+
+    setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateImage()));
     timer->start(1000);

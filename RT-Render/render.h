@@ -71,6 +71,28 @@ protected:
 
 };
 
+class XorShiftRandomEngine{
+
+    uint_fast64_t s[2]{123456789, 362436069};
+public:
+    constexpr static uint_fast64_t max(){
+        return UINT_FAST64_MAX;
+    }
+    constexpr static uint_fast64_t min(){
+        return 0;
+    }
+
+    //xorshift+ right from wiki
+    uint_fast64_t operator()(){
+        uint_fast64_t x = s[0];
+        uint_fast64_t const y = s[1];
+        s[0] = y;
+        x ^= x << 23; // a
+        s[1] = x ^ y ^ (x >> 17) ^ (y >> 26); // b, c
+        return s[1] + y;
+    }
+};
+
 }
 
 #endif // RENDER_H

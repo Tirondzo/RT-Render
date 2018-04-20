@@ -48,7 +48,7 @@ void MainWindow::on_pushButton_clicked()
     timer.start();
     width = 512;
     height = 512;
-    threads = 1;
+    threads = 4;
     QImage* img = render->startRender(scene, camera, width, height, threads);
     ui->graphicsView->setImage(img);
 }

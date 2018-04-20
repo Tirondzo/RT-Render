@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <QDebug>
+#include <random>
 
 
 
@@ -87,6 +88,12 @@ void RenderImpl::Worker::run(){
     int width = img->width();
     int height = img->height();
 
+    std::random_device rd;
+    //std::ranlux48_base mt(rd());
+    XorShiftRandomEngine mt;
+    std::uniform_real_distribution<float> fDist(.0, 1.);
+    std::uniform_real_distribution<double> dDist(.0, 1.);
+
     int x,y;
     while(counter->getNextPixel(&x, &y)){
         //qDebug() << x << " " << y << QThread::currentThread();
@@ -97,14 +104,19 @@ void RenderImpl::Worker::run(){
        int ns = 512;
        int r = 0, g = 0, b = 0, a = 0;
 
+
+
        for (int s = 0; s < ns; ++s) {
            //double dx = random::randd();
            //double dy = random::randd();
 
-           double dx = (double)rand() / RAND_MAX;
-           double dy = (double)rand() / RAND_MAX;
+           //double dx = (double)rand() / RAND_MAX;
+           //double dy = (double)rand() / RAND_MAX;
 
-           Vector3D xShift = camera->getRight() * (x - width/2.0 + dx) / width * camera->getFov();
+           double dx = dDist(mt);
+           double dy = dDist(mt);
+
+           Vector3D xShift = camera->getRight() * ((x - width/2.0 + dx) / width * camera->getFov());
            Vector3D yShift = camera->getUp() * ((y - height/2.0 + dy) / height * camera->getFov());
 
            Ray ray(camera->getPosition(), camera->getLookAt() + xShift + yShift - camera->getPosition());
