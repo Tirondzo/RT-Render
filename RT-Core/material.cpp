@@ -14,6 +14,43 @@ void Material::setIsLight(bool value)
     isLight = value;
 }
 
+Ray Material::refract(const Intersection &intersection, const Ray &ray) const
+{
+    float etai = 1, etat = ior;
+    // ior from, ior to
+
+    Vector3D Nrefr = intersection.getNormal();
+    double NdotI = Vector3D::dot(Nrefr, ray.getDirection());
+    if (NdotI < 0) {
+        // we are outside the surface
+        NdotI = -NdotI;
+    }
+    else {
+        // we are inside the surface
+        Nrefr = -intersection.getNormal();
+        // swap the refraction indices
+        std::swap(etai, etat);
+    }
+    float eta = etai / etat;
+
+
+    float k = 1 - eta * eta * (1 - NdotI * NdotI);
+    if (k < 0) {
+        // total internal reflection. There is no refraction in this case
+        Vector3D direction = ray.getDirection() - Nrefr * 2 * Vector3D::dot(ray.getDirection().normalize(), Nrefr);
+        return Ray(intersection.getPoint() + Nrefr * EPSILON, direction);
+    }else {
+        Vector3D direction = ray.getDirection() * eta + Nrefr * (eta * NdotI - sqrtf(k));
+        return Ray(intersection.getPoint() + Nrefr * EPSILON, direction);
+    }
+}
+
+Ray Material::reflect(const Intersection &intersection, const Ray &ray) const
+{
+    Vector3D direction = ray.getDirection() - intersection.getNormal() * 2 * Vector3D::dot(ray.getDirection(), intersection.getNormal());
+    return Ray(intersection.getPoint() + intersection.getNormal() * EPSILON, direction);
+}
+
 float Material::getReflectivity() const
 {
     return reflectivity;
@@ -90,41 +127,33 @@ Ray Material::getNewRay(const Intersection &intersection, const Ray &ray, float 
         */
 
     }else if(rand_k < kd + ks){ //specullar
-        Vector3D direction = ray.getDirection() - N * 2 * Vector3D::dot(ray.getDirection(), N);
-        return Ray(intersection.getPoint() + intersection.getNormal() * EPSILON, direction);
+        return reflect(intersection, ray);
     }else{ //transmittion
-        Sphere* sphere = dynamic_cast<Sphere*>(intersection.getObject());
-        if(sphere){
-            float etai = 1, etat = ior;
-            // ior from, ior to
 
-            Vector3D Nrefr = intersection.getNormal();
-            double NdotI = Vector3D::dot(Nrefr, ray.getDirection());
-            if (NdotI < 0) {
-                // we are outside the surface
-                NdotI = -NdotI;
-            }
-            else {
-                // we are inside the surface
-                Nrefr = -intersection.getNormal();
-                // swap the refraction indices
-                std::swap(etai, etat);
-            }
-            float eta = etai / etat;
-
-
-            float k = 1 - eta * eta * (1 - NdotI * NdotI);
-            if (k < 0) {
-                // total internal reflection. There is no refraction in this case
-                return Ray();
-                Vector3D direction = ray.getDirection() - Nrefr * 2 * Vector3D::dot(ray.getDirection().normalize(), Nrefr);
-                return Ray(intersection.getPoint() + Nrefr * EPSILON, direction);
-            }else {
-                Vector3D direction = ray.getDirection() * eta + Nrefr * (eta * NdotI - sqrtf(k));
-                return Ray(intersection.getPoint() + Nrefr * EPSILON, direction);
-            }
+        float kr{};
+        float cosi = Vector3D::dot(ray.getDirection(), intersection.getNormal());
+        float etai = 1, etat = ior;
+        if (cosi > 0) { std::swap(etai, etat); }
+        // Compute sini using Snell's law
+        float sint = etai / etat * sqrtf(1 - cosi * cosi);
+        // Total internal reflection
+        if (sint >= 1) {
+            kr = 1;
+        }
+        else {
+            float cost = sqrtf(1 - sint * sint);
+            cosi = fabsf(cosi);
+            float Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
+            float Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
+            kr = (Rs * Rs + Rp * Rp) / 2;
         }
 
+        float rand_trans = 1.f / (1 - kd - ks) * (rand_k - kd - ks); //rand_k => 0..1
+        if(rand_trans > kr){
+            return refract(intersection, ray);
+        }else{
+            return reflect(intersection, ray);
+        }
 
     }
 

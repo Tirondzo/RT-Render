@@ -37,7 +37,7 @@ void MainWindow::on_pushButton_clicked()
     scene->addObject(new Plane(light, Vector3D(50.0f, 0.0f, 0.0f), Vector3D(-1.0f, 0.0f, 0.0f)));
     scene->addObject(new Plane(whiteMat, Vector3D(0.0f, 0.0f, 0.0f), Vector3D(0.0f, 0.0f, 1.0f)));
 
-    scene->addObject(new Sphere(whiteMat, Vector3D(10.0f, -0.5f, 1.5f), 1.5f));
+    scene->addObject(new Sphere(glass, Vector3D(10.0f, -0.5f, 1.5f), 1.5f));
     scene->addObject(new Sphere(yellowMat, Vector3D(12, -4.8, 2.15), 2.15f));
     scene->addObject(new Sphere(redMat, Vector3D(5.5, -2.6, 0.83), 0.83f));
     scene->addObject(new Sphere(glass, Vector3D(6.6, 1, 0.5), 0.5f));

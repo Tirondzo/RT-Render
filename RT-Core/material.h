@@ -22,6 +22,8 @@ private:
     bool isLight;
 
 
+    Ray refract(const Intersection &intersection, const Ray &ray) const;
+    Ray reflect(const Intersection &intersection, const Ray &ray) const;
 public:
     Material(const Color &color,
              float kd = 0.6f,

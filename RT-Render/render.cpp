@@ -124,7 +124,7 @@ void RenderImpl::Worker::run(){
 
            Ray ray(camera->getPosition(), camera->getLookAt() + xShift + yShift - camera->getPosition());
 
-           Color color = Integrator::trace(scene, ray, 36, 0);
+           Color color = Integrator::trace(scene, ray, 64, 0);
 
            summ_squares += color * color;
            summ_colors += color;
@@ -141,7 +141,7 @@ void RenderImpl::Worker::run(){
            //qDebug() << x << y << (rs/samples) << (rn * rn / samples / samples);
            //for some reasons dispersion convergence doesn't work or infinitly slow
        //}while(samples < 1000 && (samples < 20 || (((summ_squares-(summ_colors*summ_colors/samples))/samples).slength() > 1000)));
-       }while(samples < 128);
+       }while(samples < 1024);
 
        img->setPixelColor(x,height-1-y, QColor(r/samples,g/samples,b/samples));
     }
