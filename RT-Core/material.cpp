@@ -2,6 +2,7 @@
 
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include "sphere.h"
 
 #include <cstdlib>
 
@@ -92,6 +93,38 @@ Ray Material::getNewRay(const Intersection &intersection, const Ray &ray, float 
         Vector3D direction = ray.getDirection() - N * 2 * Vector3D::dot(ray.getDirection(), N);
         return Ray(intersection.getPoint() + intersection.getNormal() * EPSILON, direction);
     }else{ //transmittion
+        Sphere* sphere = dynamic_cast<Sphere*>(intersection.getObject());
+        if(sphere){
+            float etai = 1, etat = ior;
+            // ior from, ior to
+
+            Vector3D Nrefr = intersection.getNormal();
+            double NdotI = Vector3D::dot(Nrefr, ray.getDirection());
+            if (NdotI < 0) {
+                // we are outside the surface
+                NdotI = -NdotI;
+            }
+            else {
+                // we are inside the surface
+                Nrefr = -intersection.getNormal();
+                // swap the refraction indices
+                std::swap(etai, etat);
+            }
+            float eta = etai / etat;
+
+
+            float k = 1 - eta * eta * (1 - NdotI * NdotI);
+            if (k < 0) {
+                // total internal reflection. There is no refraction in this case
+                return Ray();
+                Vector3D direction = ray.getDirection() - Nrefr * 2 * Vector3D::dot(ray.getDirection().normalize(), Nrefr);
+                return Ray(intersection.getPoint() + Nrefr * EPSILON, direction);
+            }else {
+                Vector3D direction = ray.getDirection() * eta + Nrefr * (eta * NdotI - sqrtf(k));
+                return Ray(intersection.getPoint() + Nrefr * EPSILON, direction);
+            }
+        }
+
 
     }
 

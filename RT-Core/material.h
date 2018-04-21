@@ -17,6 +17,7 @@ private:
     float kt;
     float reflectivity;
     float shiness;
+    float ior;
 
     bool isLight;
 
@@ -31,6 +32,7 @@ public:
         color(color),
         kd(kd), ks(ks), kt(kt),
         reflectivity(reflectivity),
+        ior(1.5f),
         shiness(shininess), isLight(false) {}
 
     float getReflectivity() const;

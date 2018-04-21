@@ -31,6 +31,7 @@ void MainWindow::on_pushButton_clicked()
     Material *greenMat = new Material(Color(0,255,0));
     Material *yellowMat = new Material(Color(255,255,0));
     Material *light = new Material(Color(255,255,255));
+    Material *glass = new Material(Color(255,255,255), 0,0,1);
     light->setIsLight(true);
 
     scene->addObject(new Plane(light, Vector3D(50.0f, 0.0f, 0.0f), Vector3D(-1.0f, 0.0f, 0.0f)));
@@ -39,9 +40,10 @@ void MainWindow::on_pushButton_clicked()
     scene->addObject(new Sphere(whiteMat, Vector3D(10.0f, -0.5f, 1.5f), 1.5f));
     scene->addObject(new Sphere(yellowMat, Vector3D(12, -4.8, 2.15), 2.15f));
     scene->addObject(new Sphere(redMat, Vector3D(5.5, -2.6, 0.83), 0.83f));
-    scene->addObject(new Sphere(greenMat, Vector3D(6.6, 1, 0.5), 0.5f));
+    scene->addObject(new Sphere(glass, Vector3D(6.6, 1, 0.5), 0.5f));
     scene->addObject(new Sphere(redMat, Vector3D(8.5, 2.2, 0.5), 0.5f));
     scene->addObject(new Sphere(yellowMat, Vector3D(4.6, 2.15, 0.9), 0.9f));
+    //scene->addObject(new Sphere(light, Vector3D(0,0,1), 100.f));
 
     Render *render = new Render();
     connect(render, SIGNAL(finished()), this, SLOT(render_finished()));
