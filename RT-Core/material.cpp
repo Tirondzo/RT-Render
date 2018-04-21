@@ -41,7 +41,7 @@ Ray Material::refract(const Intersection &intersection, const Ray &ray) const
         return Ray(intersection.getPoint() + Nrefr * EPSILON, direction);
     }else {
         Vector3D direction = ray.getDirection() * eta + Nrefr * (eta * NdotI - sqrtf(k));
-        return Ray(intersection.getPoint() + Nrefr * EPSILON, direction);
+        return Ray(intersection.getPoint() - Nrefr * EPSILON, direction);
     }
 }
 
