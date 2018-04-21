@@ -9,6 +9,12 @@ QT       -= core gui
 TEMPLATE = lib
 CONFIG += staticlib
 
+#QMAKE_CXXFLAGS_RELEASE -= -O1
+#QMAKE_CXXFLAGS_RELEASE -= -O2
+#QMAKE_CXXFLAGS_RELEASE -= -O3
+#QMAKE_CXXFLAGS_RELEASE *= -Ofast
+#QMAKE_CXXFLAGS_RELEASE += -march=native
+
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the

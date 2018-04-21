@@ -2,6 +2,12 @@ TEMPLATE = subdirs
 SUBDIRS += RT-Core RT-Render
 CONFIG += ordered
 
+#QMAKE_CXXFLAGS_RELEASE -= -O1
+#QMAKE_CXXFLAGS_RELEASE -= -O2
+#QMAKE_CXXFLAGS_RELEASE -= -O3
+#QMAKE_CXXFLAGS_RELEASE *= -Ofast
+#QMAKE_CXXFLAGS_RELEASE += -march=native
+
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/RT-Core/release/ -lRT-Core
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/RT-Core/debug/ -lRT-Core
 else:unix: LIBS += -L$$OUT_PWD/RT-Core/ -lRT-Core

@@ -10,9 +10,6 @@ public:
     Vector3D() : NVector<double, 3>() {}
     Vector3D(double x, double y, double z) : NVector<double, 3>(x,y,z){}
 
-    NVector<double,3> normalize() const;
-    double length() const;
-
     double getX() const { return data[0]; }
     Vector3D& setX(double value) { data[0] = value; return *this; }
     double getY() const { return data[1]; }

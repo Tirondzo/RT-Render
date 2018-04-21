@@ -6,6 +6,12 @@
 
 QT       += core gui testlib
 
+#QMAKE_CXXFLAGS_RELEASE -= -O1
+#QMAKE_CXXFLAGS_RELEASE -= -O2
+#QMAKE_CXXFLAGS_RELEASE -= -O3
+#QMAKE_CXXFLAGS_RELEASE *= -Ofast
+#QMAKE_CXXFLAGS_RELEASE += -march=native
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = RT-Render

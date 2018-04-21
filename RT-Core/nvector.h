@@ -147,13 +147,26 @@ public:
                         a.data[0] * b.data[1] - b.data[0] * a.data[1]);
     }
 
+    double invsqrtQuake( double number ) const
+  {
+      double y = number;
+      double x2 = y * 0.5;
+      std::int64_t i = *(std::int64_t *) &y;
+      // The magic number is for doubles is from https://cs.uwaterloo.ca/~m32rober/rsqrt.pdf
+      i = 0x5fe6eb50c7b537a9 - (i >> 1);
+      y = *(double *) &i;
+      y = y * (1.5 - (x2 * y * y));   // 1st iteration
+      //      y  = y * ( 1.5 - ( x2 * y * y ) );   // 2nd iteration, this can be removed
+      return y;
+  }
+
     virtual inline this_type normalize() const{
         T len{};
         this_type new_one(*this);
         for(int i = 0; i < N; i++){
             len += data[i] * data[i];
         }
-        return new_one/sqrt(len);
+        return new_one*invsqrtQuake(len);
     }
 
     virtual inline T length() const{
