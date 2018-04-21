@@ -34,9 +34,7 @@ Color Integrator::trace(Scene *scene, const Ray &ray, int maxDepth, int depth)
     Ray newRay = mat->getNewRay(intersection, ray, rand);
     Color mat_col = object->getMaterial()->getColor();
 
-    Color traced_col = trace(scene, newRay, maxDepth, depth+1);
-    for(int i = 0; i < 4; i++)
-        traced_col[i] *= mat_col[i];
+    Color traced_col = trace(scene, newRay, maxDepth, depth+1) * mat_col;
 
     return (traced_col * mat->getCoef(intersection, ray, newRay, rand))  / 255.0;
 }

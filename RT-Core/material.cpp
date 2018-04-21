@@ -36,13 +36,14 @@ Color Material::getColor() const
 double Material::getCoef(const Intersection &intersection, const Ray &ray, const Ray &newRay, float rand) const
 {
     if(rand < kd){ //diffusive
-        return abs(Vector3D::dot(newRay.getDirection(), intersection.getNormal()));
+        //return abs(Vector3D::dot(newRay.getDirection(), intersection.getNormal()));
+        return 1.0;
     }else if(rand < kd + ks){ //specullar
 
     }else{ //transmittion
 
     }
-    return 1.f;
+    return 1.0;
 }
 
 Ray Material::getNewRay(const Intersection &intersection, const Ray &ray, float rand_k) const
@@ -62,13 +63,17 @@ Ray Material::getNewRay(const Intersection &intersection, const Ray &ray, float 
 
         // gen basis
 
-        Vector3D Nt = Vector3D(N.getZ(), 0, -N.getX()).normalize();
+        Vector3D Nt;
+        if (std::fabs(N.getX()) > std::fabs(N.getY()))
+            Nt = Vector3D(N.getZ(), 0, -N.getX()).normalize();
+        else Nt = Vector3D(0, -N.getZ(), N.getY()).normalize();
+
         Vector3D Nb = Vector3D::cross(Nt, N);
 
         Vector3D translated(
-                    direction.getX() * Nb.getX() + direction.getY() * N.getX() + direction.getZ() * Nt.getX(),
-                    direction.getX() * Nb.getY() + direction.getY() * N.getY() + direction.getZ() * Nt.getY(),
-                    direction.getX() * Nb.getZ() + direction.getY() * N.getZ() + direction.getZ() * Nt.getZ());
+                    direction.getX() * Nb.getX() + direction.getY() * Nt.getX() + direction.getZ() * N.getX(),
+                    direction.getX() * Nb.getY() + direction.getY() * Nt.getY() + direction.getZ() * N.getY(),
+                    direction.getX() * Nb.getZ() + direction.getY() * Nt.getZ() + direction.getZ() * N.getZ());
 
 
         return Ray(intersection.getPoint() + intersection.getNormal() * EPSILON, translated);

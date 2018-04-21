@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cmath>
+#include <typeinfo>
 
 template <typename T, const std::size_t N>
 class NVector
@@ -19,7 +20,10 @@ public:
     typedef T value_type;
     inline static int size(void) { return N; }
 
-    inline T& operator [] (std::size_t index){
+    T& operator [] (const std::size_t index){
+        return data[index];
+    }
+    const T& operator [] (const std::size_t index) const{
         return data[index];
     }
 
@@ -30,13 +34,21 @@ public:
         }
         return new_one;
     }
-    inline virtual this_type& operator += (this_type const &v){
+
+    template<typename T2>
+    this_type& operator += (NVector<T2,N> const &v){
         for(int i = 0; i < N; i++){
-            data[i] += v.data[i];
+            operator [](i) += v.operator [](i);
         }
         return *this;
     }
 
+    inline virtual this_type& operator - (){
+        for(int i = 0; i < N; i++){
+            data[i] = -data[i];
+        }
+        return *this;
+    }
     inline virtual this_type operator - (this_type const & v) const{
         this_type new_one{};
         for(int i = 0; i < N; i++){
@@ -78,7 +90,7 @@ public:
         return *this;
     }
 
-    template <typename Scalar>
+    template <typename Scalar,typename std::enable_if<std::is_scalar<Scalar>::value>::type* = nullptr>
     inline this_type operator* (Scalar const &s) const{
         this_type new_one{};
         for(int i = 0; i < N; i++){
@@ -86,8 +98,9 @@ public:
         }
         return new_one;
     }
-    template <typename Scalar>
+    template <typename Scalar,typename std::enable_if<std::is_scalar<Scalar>::value>::type* = nullptr>
     inline this_type& operator *= (Scalar const &s){
+        static_assert(std::is_scalar<Scalar>::value, "Only scalar types");
         for(int i = 0; i < N; i++){
             data[i] *= s;
         }
@@ -144,11 +157,15 @@ public:
     }
 
     virtual inline T length() const{
+        return sqrt(slength());
+    }
+
+    virtual inline T slength() const{
         T len{};
         for(int i = 0; i < N; i++){
             len += data[i] * data[i];
         }
-        return sqrt(len);
+        return len;
     }
 };
 

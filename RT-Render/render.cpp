@@ -89,8 +89,8 @@ void RenderImpl::Worker::run(){
     int height = img->height();
 
     std::random_device rd;
-    //std::ranlux48_base mt(rd());
-    XorShiftRandomEngine mt;
+    std::ranlux48_base mt(rd());
+    //XorShiftRandomEngine mt;
     std::uniform_real_distribution<float> fDist(.0, 1.);
     std::uniform_real_distribution<double> dDist(.0, 1.);
 
@@ -101,12 +101,15 @@ void RenderImpl::Worker::run(){
        //img->setPixelColor(x,height-1-y, QColor(250,120,20));
        //QTest::qSleep(10);
        //continue;
-       int ns = 512;
        int r = 0, g = 0, b = 0, a = 0;
 
+       NVector<uint64_t, 4> summ_squares{};
+       NVector<uint64_t, 4> summ_colors{};
+       double rs = 0;
+       double rn = 0;
+       int samples{};
 
-
-       for (int s = 0; s < ns; ++s) {
+       do{
            //double dx = random::randd();
            //double dy = random::randd();
 
@@ -123,24 +126,23 @@ void RenderImpl::Worker::run(){
 
            Color color = Integrator::trace(scene, ray, 6, 0);
 
+           summ_squares += color * color;
+           summ_colors += color;
+
+           rs += (color.getR() * color.getR());
+           rn += color.getR();
+
            r += color.getR();
            g += color.getG();
            b += color.getB();
            a += color.getA();
 
-           /*
-           r += ray.getDirection().getX() * 120 + 128;
-           g += ray.getDirection().getY() * 120 + 128;
-           b += ray.getDirection().getZ() * 120 + 128;
-           */
+           samples++;
+           //qDebug() << x << y << (rs/samples) << (rn * rn / samples / samples);
+           //for some reasons dispersion convergence doesn't work or infinitly slow
+       //}while(samples < 1000 && (samples < 20 || (((summ_squares-(summ_colors*summ_colors/samples))/samples).slength() > 1000)));
+       }while(samples < 1024);
 
-           /*r += camera->getRight().getX() * 120 + 128;
-           g += camera->getRight().getY() * 120 + 128;
-           b += camera->getRight().getZ() * 120 + 128;*/
-
-           a += 255;
-       }
-
-       img->setPixelColor(x,height-1-y, QColor(r/ns,g/ns,b/ns));
+       img->setPixelColor(x,height-1-y, QColor(r/samples,g/samples,b/samples));
     }
 }
