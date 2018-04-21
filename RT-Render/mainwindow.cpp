@@ -50,7 +50,7 @@ void MainWindow::on_pushButton_clicked()
     timer.start();
     width = 512;
     height = 512;
-    threads = 4;
+    threads = QThread::idealThreadCount();
     QImage* img = render->startRender(scene, camera, width, height, threads);
     ui->graphicsView->setImage(img);
 }
@@ -60,7 +60,7 @@ void MainWindow::render_finished()
     int ms = timer.elapsed();
     QString message = "T";
     statusBar()->showMessage("Render image " + QString::number(width) + "x" + QString::number(height) +
-                             " via " + QString::number(threads) + " threds, finished in: " +
+                             " via " + QString::number(threads) + " threads, finished in: " +
                              QString::number(ms) + "ms");
 }
 

@@ -1,9 +1,9 @@
-#include "material.h"
-
 #define _USE_MATH_DEFINES
 #include <cmath>
-#include "sphere.h"
 
+#include "material.h"
+#include "sphere.h"
+#include <algorithm>
 #include <cstdlib>
 
 

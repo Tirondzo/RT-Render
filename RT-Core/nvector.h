@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <cmath>
 #include <typeinfo>
+#include <type_traits>
+#include <cstdint>
 
 template <typename T, const std::size_t N>
 class NVector
