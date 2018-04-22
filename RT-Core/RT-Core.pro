@@ -8,6 +8,7 @@ QT       -= core gui
 
 TEMPLATE = lib
 CONFIG += staticlib
+CONFIG += с++11
 
 #QMAKE_CXXFLAGS_RELEASE -= -O1
 #QMAKE_CXXFLAGS_RELEASE -= -O2

@@ -13,7 +13,9 @@
 #include <iostream>
 #include <QFile>
 #include <QDomDocument>
-#include <Qmap>
+#include <QMap>
+
+#include <locale>
 
 class XMLSceneParser
 {
@@ -28,6 +30,8 @@ public:
             std::cerr << "Unable to open file at path '" << filePath.toUtf8().constData() << "'" << std::endl;
             return nullptr;
         }
+
+        std::locale::global( std::locale( "C" ) );
 
         QDomDocument document;
         QString errorMessge;

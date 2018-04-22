@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui testlib xml
+CONFIG += с++11
 
 #QMAKE_CXXFLAGS_RELEASE -= -O1
 #QMAKE_CXXFLAGS_RELEASE -= -O2

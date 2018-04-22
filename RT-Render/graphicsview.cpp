@@ -12,8 +12,8 @@ GraphicsView::GraphicsView(QWidget *parent) : QGraphicsView(parent)
     setScene(scn);
 
     this->setCacheMode(CacheNone);
-    this->optimizationFlags().setFlag(DontSavePainterState, true);
-    this->optimizationFlags().setFlag(DontAdjustForAntialiasing, false);
+    this->optimizationFlags() |= DontSavePainterState;
+    this->optimizationFlags() &= ~DontAdjustForAntialiasing;
     this->setViewportUpdateMode(FullViewportUpdate);
 
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);

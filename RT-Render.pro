@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 SUBDIRS += RT-Core RT-Render
 CONFIG += ordered
+CONFIG += с++11
 
 #QMAKE_CXXFLAGS_RELEASE -= -O1
 #QMAKE_CXXFLAGS_RELEASE -= -O2
