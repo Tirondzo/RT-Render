@@ -48,6 +48,7 @@ void GraphicsView::setImage(QImage *value)
     QGraphicsItem *item = new MyImage(image);
     scn->addItem(item);
     this->fitInView(scn->itemsBoundingRect(), Qt::KeepAspectRatio);
+    scn->setSceneRect(scn->itemsBoundingRect());
 }
 
 
