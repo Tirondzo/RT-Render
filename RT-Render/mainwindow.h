@@ -4,6 +4,10 @@
 #include <QMainWindow>
 #include <QTime>
 
+#include "render.h"
+#include "rendersettings.h"
+#include "xmlsceneparser.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -12,10 +16,11 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    QTime timer;
-    int width;
-    int height;
-    int threads;
+    Render* render{};
+    RenderSettings *settings{};
+
+    void updateGUIfromSettings();
+    void updateSettingsfromGUI();
 
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -23,7 +28,13 @@ public:
 
 private slots:
     void on_pushButton_clicked();
-    void render_finished();
+    void render_finished(int ms);
+
+    void on_scene_selector_currentIndexChanged(int index);
+
+    void on_threads_ideal_toggled(bool checked);
+
+    void on_scene_selector_activated(int index);
 
 private:
     Ui::MainWindow *ui;

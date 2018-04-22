@@ -8,11 +8,63 @@
 #include "material.h"
 #include "color.h"
 
+#include "defaultscenes.h"
+
+#include <QStandardItemModel>
+#include <QFileDialog>
+
+
+void MainWindow::updateGUIfromSettings()
+{
+    if(!settings) return;
+    ui->image_w->setText(QString::number(settings->getWidth()));
+    ui->image_h->setText(QString::number(settings->getHeight()));
+
+    ui->threads_n->setText(QString::number(settings->getThreadsCount()));
+    ui->threads_ideal->setChecked(settings->getIsIdealThreadsCount());
+
+    ui->max_samples->setText(QString::number(settings->getSamplesPerPixel()));
+    ui->max_reflections->setText(QString::number(settings->getMaxReflections()));
+}
+
+void MainWindow::updateSettingsfromGUI()
+{
+    if(!settings) return;
+    settings->setWidth(ui->image_w->text().toInt());
+    settings->setHeight(ui->image_h->text().toInt());
+
+    settings->setThreadsCount(ui->threads_n->text().toInt());
+    settings->setIsIdealThreadsCount(ui->threads_ideal->isChecked());
+
+    settings->setSamplesPerPixel(ui->max_samples->text().toInt());
+    settings->setMaxReflections(ui->max_reflections->text().toInt());
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    render = new Render();
+    connect(render, SIGNAL(finished(int)), this, SLOT(render_finished(int)));
+
+    ui->scene_selector->addItem(tr("Select from file..."));
+    ui->scene_selector->insertSeparator(1);
+    ui->scene_selector->addItem(tr("Spheres1"), QVariant(1));
+    ui->scene_selector->addItem(tr("Spheres2"), QVariant(2));
+    ui->scene_selector->addItem(tr("Corner1"), QVariant(3));
+
+    QIntValidator *intValidator = new QIntValidator(0, 16384, this);
+    ui->image_w->setValidator(intValidator);
+    ui->image_h->setValidator(intValidator);
+
+    ui->threads_n->setValidator(new QIntValidator(0, 64, this));
+    ui->threads_ideal->setToolTip("Ideal threads count");
+
+    ui->max_samples->setValidator(intValidator);
+    ui->max_reflections->setValidator(intValidator);
+
 }
 
 
@@ -23,45 +75,61 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    Scene *scene = new Scene();
-    Camera *camera = new Camera(Vector3D(0.0f, 0.0f, 1.0f), Vector3D(1.0f, 0.0f, 1.0f), 1.0f, 9.5f, 2.0f);
-
-    Material *whiteMat = new Material(Color(255,255,255), 1.f, .0f, .0f);
-    Material *redMat = new Material(Color(255,0,0));
-    Material *greenMat = new Material(Color(0,255,0));
-    Material *yellowMat = new Material(Color(255,255,0));
-    Material *light = new Material(Color(255,255,255));
-    Material *glass = new Material(Color(255,255,255), 0,0,1);
-    light->setIsLight(true);
-
-    scene->addObject(new Plane(light, Vector3D(50.0f, 0.0f, 0.0f), Vector3D(-1.0f, 0.0f, 0.0f)));
-    scene->addObject(new Plane(whiteMat, Vector3D(0.0f, 0.0f, 0.0f), Vector3D(0.0f, 0.0f, 1.0f)));
-
-    scene->addObject(new Sphere(glass, Vector3D(10.0f, -0.5f, 1.5f), 1.5f));
-    scene->addObject(new Sphere(yellowMat, Vector3D(12, -4.8, 2.15), 2.15f));
-    scene->addObject(new Sphere(redMat, Vector3D(5.5, -2.6, 0.83), 0.83f));
-    scene->addObject(new Sphere(glass, Vector3D(6.6, 1, 0.5), 0.5f));
-    scene->addObject(new Sphere(redMat, Vector3D(8.5, 2.2, 0.5), 0.5f));
-    scene->addObject(new Sphere(yellowMat, Vector3D(4.6, 2.15, 0.9), 0.9f));
-    //scene->addObject(new Sphere(light, Vector3D(0,0,1), 100.f));
-
-    Render *render = new Render();
-    connect(render, SIGNAL(finished()), this, SLOT(render_finished()));
-    timer.start();
-    width = 512;
-    height = 512;
-    threads = QThread::idealThreadCount();
-    QImage* img = render->startRender(scene, camera, width, height, threads);
-    ui->graphicsView->setImage(img);
+    if(settings){
+        updateSettingsfromGUI();
+        QImage* img = render->startRender(settings->getScene(), settings->getCamera(),
+                                          settings->getWidth(), settings->getHeight(),
+                                          settings->getThreadsCount(),
+                                          settings->getSamplesPerPixel(),
+                                          settings->getMaxReflections());
+        ui->graphicsView->setImage(img);
+    }
 }
 
-void MainWindow::render_finished()
+void MainWindow::render_finished(int ms)
 {
-    int ms = timer.elapsed();
-    QString message = "T";
+    int width = settings->getWidth();
+    int height = settings->getHeight();
+    int threads = settings->getThreadsCount();
     statusBar()->showMessage("Render image " + QString::number(width) + "x" + QString::number(height) +
                              " via " + QString::number(threads) + " threads, finished in: " +
                              QString::number(ms) + "ms");
 }
 
 
+
+void MainWindow::on_scene_selector_currentIndexChanged(int index)
+{
+
+}
+
+void MainWindow::on_threads_ideal_toggled(bool checked)
+{
+    if(!settings) return;
+    ui->threads_n->setEnabled(!checked);
+    settings->setThreadsCount(QThread::idealThreadCount());
+    ui->threads_n->setText(QString::number(settings->getThreadsCount()));
+}
+
+void MainWindow::on_scene_selector_activated(int index)
+{
+    delete [] settings;
+    QVariant var = ui->scene_selector->itemData(index);
+    if(index == 0){
+        QString fileName = QFileDialog::getOpenFileName(this,
+            tr("Open Image"), "", tr("Scene file (*.xml)"));
+
+        if(!fileName.isEmpty()){
+            XMLSceneParser parser{};
+            settings = parser.loadScene(fileName);
+        }
+    }else if(var.isValid() && var.value<int>() == 1){
+        settings = new Spheres1();
+    }else if(var.isValid() && var.value<int>() == 2){
+        settings = new Spheres2();
+    }else if(var.isValid() && var.value<int>() == 3){
+        settings = new Corner1();
+    }
+
+    updateGUIfromSettings();
+}

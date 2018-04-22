@@ -20,23 +20,29 @@ public:
     Render();
     ~Render();
 
-    QImage* startRender(Scene *scene, Camera *camera, int width, int height, int threads = 1);
+    QImage* startRender(Scene *scene, Camera *camera,
+                        int width, int height,
+                        int threads = 1, int maxSamples = 512,
+                        int maxReflections = 64);
     QImage *getImage() const;
+    QTime timer;
 
 private:
     void stopThreads();
     mutable QMutex mutex;
 
-    int activeThreads;
+    int activeThreads{};
 
-    int width, height;
+    int width{}, height{};
+    int maxSamples;
+    int maxReflections;
 
 public slots:
     void finishedOne();
 
 signals:
     void stopAll();
-    void finished();
+    void finished(int ms);
 };
 
 
@@ -62,10 +68,21 @@ class Worker : public QThread{
     Render *render;
     Camera *camera;
     Scene *scene;
+    bool active;
+    int maxSamples;
+    int maxReflections;
 
 public:
-    Worker(Render* render, Counter *cnt, Camera *cam, Scene *scn) :
-        render(render), counter(cnt), camera(cam), scene(scn) {}
+    Worker(Render* render, Counter *cnt,
+           Camera *cam, Scene *scn,
+           int maxSamples = 512, int maxReflections = 64) :
+        render(render), counter(cnt),
+        camera(cam), scene(scn),
+        active(true), maxSamples(maxSamples),
+        maxReflections(maxReflections){}
+
+public slots:
+    void kill();
 protected:
     virtual void run();
 

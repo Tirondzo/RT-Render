@@ -1,5 +1,10 @@
 #include "scene.h"
 
+void Scene::setGamma(float value)
+{
+    gamma = value;
+}
+
 Color Scene::getAmbient() const
 {
     return ambient;

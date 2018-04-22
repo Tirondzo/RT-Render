@@ -29,7 +29,7 @@ public:
              float kd = 0.6f,
              float ks = 0.4f,
              float kt = 0.0f,
-             float reflectivity = 0.13f,
+             float reflectivity = 0.9f,
              float shininess = 100.0f) :
         color(color),
         kd(kd), ks(ks), kt(kt),

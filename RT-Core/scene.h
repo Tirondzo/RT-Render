@@ -18,6 +18,8 @@ public:
     Color getAmbient() const;
     void setAmbient(const Color &value);
     float getGamma() const;
+    void setGamma(float value);
+
     void addObject(Object * object) { objects.push_back(object); }
 
     Intersection findClosestIntersection(const Ray &ray) const;

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui testlib
+QT       += core gui testlib xml
 
 #QMAKE_CXXFLAGS_RELEASE -= -O1
 #QMAKE_CXXFLAGS_RELEASE -= -O2
@@ -35,12 +35,18 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     graphicsview.cpp \
-    render.cpp
+    render.cpp \
+    xmlsceneparser.cpp \
+    rendersettings.cpp \
+    defaultscenes.cpp
 
 HEADERS += \
         mainwindow.h \
     graphicsview.h \
-    render.h
+    render.h \
+    xmlsceneparser.h \
+    rendersettings.h \
+    defaultscenes.h
 
 FORMS += \
         mainwindow.ui

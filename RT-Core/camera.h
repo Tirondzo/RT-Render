@@ -24,6 +24,7 @@ public:
     Vector3D& getLookAt();
     Vector3D& getUp();
     Vector3D& getRight();
+    Vector3D& getDirection();
     float getFov() const;
 };
 

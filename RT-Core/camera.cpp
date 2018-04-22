@@ -12,7 +12,7 @@ Camera::Camera(Vector3D position, Vector3D lookAt, float fov, float focus, float
 {
     direction = (lookAt - position).normalize();
     up = Vector3D::cross(direction, Vector3D::cross(Vector3D(0.0f, 0.0f, 1.0f), direction)).normalize();
-    right = Vector3D::cross(up, direction);
+    right = Vector3D::cross(up, direction).normalize();
 }
 
 
@@ -34,4 +34,9 @@ Vector3D& Camera::getRight()
 Vector3D& Camera::getPosition()
 {
     return position;
+}
+
+Vector3D& Camera::getDirection()
+{
+    return direction;
 }

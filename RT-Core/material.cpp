@@ -75,7 +75,7 @@ double Material::getCoef(const Intersection &intersection, const Ray &ray, const
 {
     if(rand < kd){ //diffusive
         //return abs(Vector3D::dot(newRay.getDirection(), intersection.getNormal()));
-        return 1.0;
+        return reflectivity;
     }else if(rand < kd + ks){ //specullar
 
     }else{ //transmittion

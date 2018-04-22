@@ -13,7 +13,7 @@ QImage *Render::getImage() const
     return image;
 }
 
-Render::Render() : mutex()
+Render::Render() : mutex(), timer(), activeThreads()
 {
     image = nullptr;
 }
@@ -24,26 +24,34 @@ Render::~Render()
 }
 
 
-QImage *Render::startRender(Scene *scene, Camera *camera, int width, int height, int threads)
+QImage *Render::startRender(Scene *scene, Camera *camera,
+                            int width, int height,
+                            int threads, int maxSamples, int maxReflections)
 {
     //if(image != nullptr)
         //delete [] image;
 
     //mutex.lock();
 
+    emit stopAll();
+
+    timer.start();
+
     this->width = width;
     this->height = height;
+    this->maxSamples = maxSamples;
+    this->maxReflections = maxReflections;
     image = new QImage(width, height, QImage::Format::Format_RGB888);
 
-
-    activeThreads = threads;
+    activeThreads += threads;
 
     RenderImpl::Counter *counter = new RenderImpl::Counter(width, height, -1, 0);
 
     for(int i = 0; i < threads; i++){
-        RenderImpl::Worker *thrd = new RenderImpl::Worker(this, counter, camera, scene);
+        RenderImpl::Worker *thrd = new RenderImpl::Worker(this, counter, camera, scene, maxSamples, maxReflections);
         connect(thrd, SIGNAL(finished()), this, SLOT(finishedOne()));
         connect(thrd, SIGNAL(finished()), thrd, SLOT(deleteLater()));
+        connect(this, SIGNAL(stopAll()), thrd, SLOT(kill()));
         thrd->start();
         thrd->setPriority(QThread::HighestPriority);
     }
@@ -53,7 +61,7 @@ QImage *Render::startRender(Scene *scene, Camera *camera, int width, int height,
 
 void Render::stopThreads()
 {
-
+    emit stopAll();
 }
 
 
@@ -61,7 +69,7 @@ void Render::finishedOne()
 {
     activeThreads--;
     if(activeThreads <= 0)
-        emit finished();
+        emit finished(timer.elapsed());
 }
 
 
@@ -83,6 +91,11 @@ bool RenderImpl::Counter::getNextPixel(int *rx, int *ry){
     return true;
 }
 
+void RenderImpl::Worker::kill()
+{
+    active = false;
+}
+
 void RenderImpl::Worker::run(){
     QImage *img = render->getImage();
     int width = img->width();
@@ -95,7 +108,8 @@ void RenderImpl::Worker::run(){
     std::uniform_real_distribution<double> dDist(.0, 1.);
 
     int x,y;
-    while(counter->getNextPixel(&x, &y)){
+    while(active && counter->getNextPixel(&x, &y)){
+
         //qDebug() << x << " " << y << QThread::currentThread();
 
        //img->setPixelColor(x,height-1-y, QColor(250,120,20));
@@ -120,11 +134,11 @@ void RenderImpl::Worker::run(){
            double dy = dDist(mt);
 
            Vector3D xShift = camera->getRight() * ((x - width/2.0 + dx) / width * camera->getFov());
-           Vector3D yShift = camera->getUp() * ((y - height/2.0 + dy) / height * camera->getFov());
+           Vector3D yShift = camera->getUp() * ((y - height/2.0 + dy) / width * camera->getFov());
 
-           Ray ray(camera->getPosition(), camera->getLookAt() + xShift + yShift - camera->getPosition());
+           Ray ray(camera->getPosition(), camera->getDirection() + xShift + yShift);
 
-           Color color = Integrator::trace(scene, ray, 64, 0);
+           Color color = Integrator::trace(scene, ray, maxReflections, 0);
 
            summ_squares += color * color;
            summ_colors += color;
@@ -141,7 +155,7 @@ void RenderImpl::Worker::run(){
            //qDebug() << x << y << (rs/samples) << (rn * rn / samples / samples);
            //for some reasons dispersion convergence doesn't work or infinitly slow
        //}while(samples < 1000 && (samples < 20 || (((summ_squares-(summ_colors*summ_colors/samples))/samples).slength() > 1000)));
-       }while(samples < 1024);
+       }while(active && samples < maxSamples);
 
        img->setPixelColor(x,height-1-y, QColor(r/samples,g/samples,b/samples));
     }

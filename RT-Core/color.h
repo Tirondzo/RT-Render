@@ -11,7 +11,7 @@ public:
     static const Color BLUE;
     static const Color WHITE;
 
-    Color(int r, int g, int b, int a = 255) : NVector<int, 4>(r,g,b,a) { }
+    Color(int r=255, int g=255, int b=255, int a = 255) : NVector<int, 4>(r,g,b,a) { }
     Color(NVector<int, 4> v) : NVector<int, 4>(v){}
 
     double getR() const { return data[0]; }
