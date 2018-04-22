@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<scene ambient="255,255,255">
+    <camera>
+        <position val="0,0,1"/>
+        <lookAt val="1,0,1"/>
+        <fov val="1.6"/>
+    </camera>
+
+    <settings>
+        <size width="512" height="512"/>
+        <threads ideal=""/>
+        <samples n="10"/>
+        <reflections n="10"/>
+    </settings>
+
+    <material id="mat1">
+        <color val="250,250,250"/>
+        <mix kd="1" kt="0" ks="0"/>
+        <reflectivity val=".9"/>
+    </material>
+    <material id="matBall1">
+        <color val="255,160,255"/>
+        <mix kd=".1" kt="0" ks=".9"/>
+        <reflectivity val=".9"/>
+    </material>
+    <material id="matBall2">
+        <color val="250,250,250"/>
+        <mix kd="0" kt="0" ks="1"/>
+        <reflectivity val=".9"/>
+    </material>
+    <material id="mlight1" light="">
+        <color val="255,255,255"/>
+    </material>
+
+
+
+    <object type="plane">
+        <material id="mat1"/>
+        <center val="0,0,-5"/>
+        <normal val="0,0,1"/>
+    </object>
+    <object type="plane">
+        <material id="mat1"/>
+        <center val="0,0,5"/>
+        <normal val="0,0,-1"/>
+    </object>
+    <object type="plane">
+        <material id="mlight1"/>
+        <center val="-50,0,0"/>
+        <normal val="1,0,0"/>
+    </object>
+    <object type="plane">
+        <material id="matBall2"/>
+        <center val="10,0,0"/>
+        <normal val="-1,0,0"/>
+    </object>
+
+
+    <object type="sphere">
+        <material id="matBall2"/>
+        <center val="3,0,0"/>
+        <radius val=".3"/>
+    </object>
+
+
+    <object type="plane">
+        <material id="matBall2"/>
+        <center val="0,5,0"/>
+        <normal val="0,-1,0"/>
+    </object>
+
+    <object type="plane">
+        <material id="matBall2"/>
+        <center val="0,-5,0"/>
+        <normal val="0,1,0"/>
+    </object>
+</scene>
