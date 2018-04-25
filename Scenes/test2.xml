@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<scene ambient="0,255,0">
+    <camera>
+        <position val="0,0,1"/>
+        <lookAt val="1,0,1"/>
+        <fov val="1"/>
+    </camera>
+
+    <settings>
+        <size width="1024" height="768"/>
+        <threads ideal=""/>
+        <samples n="128"/>
+        <reflections n="128"/>
+    </settings>
+
+    <material id="mat1">
+        <color val="255,255,255"/>
+        <mix kd="1" kt="0" ks="0"/>
+        <reflectivity val=".9"/>
+    </material>
+    <material id="mat11">
+        <color val="0,255,0"/>
+        <mix kd="1" kt="0" ks="0"/>
+        <reflectivity val=".9"/>
+    </material>
+    <material id="mat111">
+        <color val="255,0,0"/>
+        <mix kd="1" kt="0" ks="0"/>
+        <reflectivity val=".9"/>
+    </material>
+    <material id="mat2">
+        <color val="255,255,255"/>
+        <mix kd="0" kt="1" ks="0"/>
+        <reflectivity val=".9"/>
+    </material>
+    <material id="mlight1" light="">
+        <color val="255,255,255"/>
+    </material>
+
+    
+    <object type="plane">
+        <material id="mlight1"/>
+        <center val="10,0,2"/>
+        <normal val="-1,0,0"/>
+        <size width="1" length="1"/>
+    </object>
+    <object type="sphere">
+        <material id="mat2"/>
+        <center val="10,0,2"/>
+        <radius val="1"/>
+    </object>
+
+
+    <object type="plane">
+        <material id="mat1"/>
+        <center val="0,0,0"/>
+        <normal val="0,0,1"/>
+    </object>
+    <object type="plane">
+        <material id="mlight1"/>
+        <center val="0,0,30"/>
+        <normal val="0,0,-1"/>
+    </object>
+    <object type="plane">
+        <material id="mat11"/>
+        <center val="50,0,0"/>
+        <normal val="-1,0,0"/>
+    </object>
+
+    <object type="plane">
+        <material id="mlight1"/>
+        <center val="-50,0,0"/>
+        <normal val="1,0,0"/>
+    </object>
+    <object type="plane">
+        <material id="mat1"/>
+        <center val="0,50,0"/>
+        <normal val="0,-1,0"/>
+    </object>
+    <object type="plane">
+        <material id="mat111"/>
+        <center val="0,-50,0"/>
+        <normal val="0,1,0"/>
+    </object>
+</scene>

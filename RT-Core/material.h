@@ -7,8 +7,9 @@ class Intersection;
 #include "intersection.h"
 #include "vector3d.h"
 #include "ray.h"
+#include "randomly.h"
 
-class Material
+class Material : protected Randomly
 {
 private:
     Color color;
@@ -31,6 +32,7 @@ public:
              float kt = 0.0f,
              float reflectivity = 0.9f,
              float shininess = 100.0f) :
+        Randomly(),
         color(color),
         kd(kd), ks(ks), kt(kt),
         reflectivity(reflectivity),
@@ -44,9 +46,10 @@ public:
     void setIsLight(bool value);
     Color getColor() const;
 
+    double getIOR(double A, double B, double C, double D, double E, double wlen) const;
 
-    double getCoef(const Intersection &intersection, const Ray &ray, const Ray &newRay, float rand) const;
-    Ray getNewRay(const Intersection &intersection, const Ray &ray, float rand = .0f) const;
+    double getCoef(const Intersection &intersection, const Ray &ray, const Ray &newRay, float rand);
+    Ray getNewRay(const Intersection &intersection, const Ray &ray, float rand = .0f);
 
 };
 

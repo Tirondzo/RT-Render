@@ -10,11 +10,11 @@
 
 #include "rendersettings.h"
 
-#include <iostream>
 #include <QFile>
 #include <QDomDocument>
 #include <QMap>
 
+#include <iostream>
 #include <locale>
 
 class XMLSceneParser

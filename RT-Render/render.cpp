@@ -29,7 +29,7 @@ QImage *Render::startRender(Scene *scene, Camera *camera,
                             int threads, int maxSamples, int maxReflections)
 {
     //if(image != nullptr)
-        //delete [] image;
+    //delete [] image;
 
     //mutex.lock();
 
@@ -45,7 +45,7 @@ QImage *Render::startRender(Scene *scene, Camera *camera,
 
     activeThreads += threads;
 
-    RenderImpl::Counter *counter = new RenderImpl::Counter(width, height, -1, 0);
+    RenderImpl::Counter *counter = new RenderImpl::Counter(width, height, 0, 0);
 
     for(int i = 0; i < threads; i++){
         RenderImpl::Worker *thrd = new RenderImpl::Worker(this, counter, camera, scene, maxSamples, maxReflections);
@@ -73,22 +73,24 @@ void Render::finishedOne()
 }
 
 
-bool RenderImpl::Counter::getNextPixel(int *rx, int *ry){
+bool RenderImpl::Counter::getNextPixelGroup(int *rx, int *ry, int count){
     //QMutexLocker ml(&mutex);
     mutex.lock();
-    x++;
-    if(x >= width){
-        x = 0;
-        y++;
+    *rx = x;
+    *ry = y;
+    bool ret = x < width && y < height;
+    for(int i = 0; i < count; i++){
+        x++;
+        if(x >= width){
+            x = 0;
+            y++;
+        }
+        if(y >= height){
+            break;
+        }
     }
-    if(y >= height){
-        mutex.unlock();
-        return false;
-    }
-
-    *rx = x; *ry = y;
     mutex.unlock();
-    return true;
+    return ret;
 }
 
 void RenderImpl::Worker::kill()
@@ -101,62 +103,69 @@ void RenderImpl::Worker::run(){
     int width = img->width();
     int height = img->height();
 
-    std::random_device rd;
-    std::ranlux48_base mt(rd());
-    //XorShiftRandomEngine mt;
-    std::uniform_real_distribution<float> fDist(.0, 1.);
-    std::uniform_real_distribution<double> dDist(.0, 1.);
+    Integrator integrator{};
 
     int x,y;
-    while(active && counter->getNextPixel(&x, &y)){
+    int count = 128;
+    while(active && counter->getNextPixelGroup(&x, &y, count)){
+        for(int i = 0; i < count && active; i++){
 
-        //qDebug() << x << " " << y << QThread::currentThread();
 
-       //img->setPixelColor(x,height-1-y, QColor(250,120,20));
-       //QTest::qSleep(10);
-       //continue;
-       int r = 0, g = 0, b = 0, a = 0;
+            //qDebug() << x << " " << y << QThread::currentThread();
 
-       NVector<uint64_t, 4> summ_squares{};
-       NVector<uint64_t, 4> summ_colors{};
-       double rs = 0;
-       double rn = 0;
-       int samples{};
+            //img->setPixelColor(x,height-1-y, QColor(250,120,20));
+            //QTest::qSleep(10);
+            //continue;
+            int r = 0, g = 0, b = 0, a = 0;
 
-       do{
-           //double dx = random::randd();
-           //double dy = random::randd();
+            NVector<uint64_t, 4> summ_squares{};
+            NVector<uint64_t, 4> summ_colors{};
+            double rs = 0;
+            double rn = 0;
+            int samples{};
 
-           //double dx = (double)rand() / RAND_MAX;
-           //double dy = (double)rand() / RAND_MAX;
+            do{
+                //double dx = random::randd();
+                //double dy = random::randd();
 
-           double dx = dDist(mt);
-           double dy = dDist(mt);
+                //double dx = (double)rand() / RAND_MAX;
+                //double dy = (double)rand() / RAND_MAX;
 
-           Vector3D xShift = camera->getRight() * ((x - width/2.0 + dx) / width * camera->getFov());
-           Vector3D yShift = camera->getUp() * ((y - height/2.0 + dy) / width * camera->getFov());
+                double dx = dDist(mt);
+                double dy = dDist(mt);
 
-           Ray ray(camera->getPosition(), camera->getDirection() + xShift + yShift);
+                Vector3D xShift = camera->getRight() * ((x - width/2.0 + dx) / width * camera->getFov());
+                Vector3D yShift = camera->getUp() * ((y - height/2.0 + dy) / width * camera->getFov());
 
-           Color color = Integrator::trace(scene, ray, maxReflections, 0);
+                Ray ray(camera->getPosition(), camera->getDirection() + xShift + yShift);
 
-           summ_squares += color * color;
-           summ_colors += color;
+                Color color = integrator.trace(scene, ray, maxReflections, 0);
 
-           rs += (color.getR() * color.getR());
-           rn += color.getR();
+                summ_squares += color * color;
+                summ_colors += color;
 
-           r += color.getR();
-           g += color.getG();
-           b += color.getB();
-           a += color.getA();
+                rs += (color.getR() * color.getR());
+                rn += color.getR();
 
-           samples++;
-           //qDebug() << x << y << (rs/samples) << (rn * rn / samples / samples);
-           //for some reasons dispersion convergence doesn't work or infinitly slow
-       //}while(samples < 1000 && (samples < 20 || (((summ_squares-(summ_colors*summ_colors/samples))/samples).slength() > 1000)));
-       }while(active && samples < maxSamples);
+                r += color.getR();
+                g += color.getG();
+                b += color.getB();
+                a += color.getA();
 
-       img->setPixelColor(x,height-1-y, QColor(r/samples,g/samples,b/samples));
+                samples++;
+                //qDebug() << x << y << (rs/samples) << (rn * rn / samples / samples);
+                //for some reasons dispersion convergence doesn't work or infinitly slow
+                //}while(samples < 1000 && (samples < 20 || (((summ_squares-(summ_colors*summ_colors/samples))/samples).slength() > 1000)));
+            }while(active && samples < maxSamples);
+
+            img->setPixelColor(x,height-1-y, QColor(r/samples,g/samples,b/samples));
+            x++;
+            if(x >= width){
+                x = 0; y++;
+            }
+            if(y >= height){
+                break;
+            }
+        }
     }
 }

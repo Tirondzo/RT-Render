@@ -4,12 +4,13 @@
 #include "color.h"
 #include "ray.h"
 #include "scene.h"
+#include "randomly.h"
 
-class Integrator
+class Integrator : protected Randomly
 {
 public:
-    Integrator();
-    static Color trace(Scene *scene, const Ray &ray, int maxDepth, int depth = 0);
+    Integrator() : Randomly() {}
+    Color trace(Scene *scene, const Ray &ray, int maxDepth, int depth = 0);
 };
 
 #endif // INTEGRATOR_H

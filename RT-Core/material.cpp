@@ -71,7 +71,16 @@ Color Material::getColor() const
     return color;
 }
 
-double Material::getCoef(const Intersection &intersection, const Ray &ray, const Ray &newRay, float rand) const
+double Material::getIOR(double A, double B, double C, double D, double E, double wlen) const
+{
+    double wlenMicrons = wlen / 1000.;
+    double wlenMicroSq = wlenMicrons * wlenMicrons;
+    double L = 1. / (wlenMicroSq - 0.028);
+    double ior = A + B*L + C*L*L + D*wlenMicroSq + E * wlenMicroSq * wlenMicroSq;
+    return ior;
+}
+
+double Material::getCoef(const Intersection &intersection, const Ray &ray, const Ray &newRay, float rand)
 {
     if(rand < kd){ //diffusive
         //return abs(Vector3D::dot(newRay.getDirection(), intersection.getNormal()));
@@ -84,14 +93,12 @@ double Material::getCoef(const Intersection &intersection, const Ray &ray, const
     return 1.0;
 }
 
-Ray Material::getNewRay(const Intersection &intersection, const Ray &ray, float rand_k) const
+Ray Material::getNewRay(const Intersection &intersection, const Ray &ray, float rand_k)
 {
     Vector3D N = intersection.getNormal();
     if(rand_k < kd){ //diffusive
-        //double r1 = random::randd();
-        //double r2 = random::randd();
-        double r1 = (double)rand() / RAND_MAX;
-        double r2 = (double)rand() / RAND_MAX;
+        double r1 = dDist(mt);
+        double r2 = dDist(mt);
 
         double phi = 2 * M_PI * r1;
         double cosTheta = sqrt(1-r2);

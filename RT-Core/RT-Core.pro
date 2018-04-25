@@ -39,7 +39,8 @@ SOURCES += \
     material.cpp \
     plane.cpp \
     sphere.cpp \
-    camera.cpp
+    camera.cpp \
+    randomly.cpp
 
 HEADERS += \
         ray.h \
@@ -53,4 +54,5 @@ HEADERS += \
     material.h \
     plane.h \
     sphere.h \
-    camera.h
+    camera.h \
+    randomly.h

@@ -5,10 +5,6 @@
 #include <math.h>
 #include <cstdlib>
 
-Integrator::Integrator()
-{
-}
-
 Color Integrator::trace(Scene *scene, const Ray &ray, int maxDepth, int depth)
 {
     if(depth >= maxDepth){
@@ -29,7 +25,8 @@ Color Integrator::trace(Scene *scene, const Ray &ray, int maxDepth, int depth)
     }
 
     //float rand = random::randf();
-    float rand = (float)std::rand() / RAND_MAX;
+    //float rand = (float)std::rand() / RAND_MAX;
+    float rand = fDist(mt);
 
     Ray newRay = mat->getNewRay(intersection, ray, rand);
     Color mat_col = object->getMaterial()->getColor();
