@@ -13,7 +13,27 @@ QImage *Render::getImage() const
     return image;
 }
 
-Render::Render() : mutex(), timer(), activeThreads()
+int Render::getCurrentProgress() const
+{
+    if(counter){
+        return counter->getCurrPixelsDone();
+    }
+    return 0;
+}
+
+int Render::getTargetProgress() const
+{
+    return width*height;
+}
+
+int Render::getRenderedTime() const
+{
+    if(activeThreads <= 0){
+        return renderFinishedTime;
+    }else return timer.elapsed();
+}
+
+Render::Render() : counter{}, mutex(), timer(), activeThreads()
 {
     image = nullptr;
 }
@@ -45,7 +65,7 @@ QImage *Render::startRender(Scene *scene, Camera *camera,
 
     activeThreads += threads;
 
-    RenderImpl::Counter *counter = new RenderImpl::Counter(width, height, 0, 0);
+    this->counter = new RenderImpl::Counter(width, height, 0, 0);
 
     for(int i = 0; i < threads; i++){
         RenderImpl::Worker *thrd = new RenderImpl::Worker(this, counter, camera, scene, maxSamples, maxReflections);
@@ -68,8 +88,10 @@ void Render::stopThreads()
 void Render::finishedOne()
 {
     activeThreads--;
-    if(activeThreads <= 0)
-        emit finished(timer.elapsed());
+    if(activeThreads <= 0){
+        renderFinishedTime = timer.elapsed();
+        emit finished(renderFinishedTime);
+    }
 }
 
 
@@ -91,6 +113,15 @@ bool RenderImpl::Counter::getNextPixelGroup(int *rx, int *ry, int count){
     }
     mutex.unlock();
     return ret;
+}
+
+int RenderImpl::Counter::getCurrPixelsDone()
+{
+    mutex.lock();
+    int ans = y * width + x;
+    ans = std::min(ans, width*height);
+    mutex.unlock();
+    return ans;
 }
 
 void RenderImpl::Worker::kill()

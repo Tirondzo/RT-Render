@@ -10,6 +10,10 @@
 
 #include <QTest>
 
+namespace RenderImpl {
+    class Counter;
+}
+
 class Render : public QObject
 {
     Q_OBJECT
@@ -25,7 +29,10 @@ public:
                         int threads = 1, int maxSamples = 512,
                         int maxReflections = 64);
     QImage *getImage() const;
+    int getCurrentProgress() const;
+    int getTargetProgress() const;
     QTime timer;
+    int getRenderedTime() const;
 
 private:
     void stopThreads();
@@ -36,6 +43,8 @@ private:
     int width{}, height{};
     int maxSamples;
     int maxReflections;
+    int renderFinishedTime{};
+    RenderImpl::Counter *counter;
 
 public slots:
     void finishedOne();
@@ -58,16 +67,17 @@ public:
     Counter(int w, int h, int x = 0, int y = 0) : width(w), height(h), x(x), y(y), mutex(){}
 
     bool getNextPixelGroup(int *rx, int *ry, int count = 10);
+    int getCurrPixelsDone();
 };
 
 
 class Worker : public QThread, protected Randomly{
     Q_OBJECT
 
-    Counter *counter;
-    Render *render;
-    Camera *camera;
-    Scene *scene;
+    Counter *counter{};
+    Render *render{};
+    Camera *camera{};
+    Scene *scene{};
     bool active;
     int maxSamples;
     int maxReflections;

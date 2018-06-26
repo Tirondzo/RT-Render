@@ -12,7 +12,25 @@
 
 #include <QStandardItemModel>
 #include <QFileDialog>
+#include <QInputDialog>
+#include <QClipboard>
 
+
+const std::vector<std::pair<QString, QString> > MainWindow::get_description_info() const{
+    return std::vector<std::pair<QString, QString>> {
+    {"width", (settings ? QString::number(settings->getWidth()) : "")},
+    {"height", (settings ? QString::number(settings->getHeight()) : "")},
+    {"samples_px", (settings ? QString::number(settings->getSamplesPerPixel()) : "")},
+    {"reflects_max", (settings ? QString::number(settings->getMaxReflections()) : "")},
+    {"threads", (settings ? QString::number(settings->getThreadsCount()) : "")},
+    {"threads_ideal", (QString::number(QThread::idealThreadCount()))},
+    {"curr_progress", (render ? QString::number(render->getCurrentProgress()) : "")},
+    {"targ_progress", (render ? QString::number(render->getTargetProgress()) : "")},
+    {"proc_progress", (render ? QString::number((double)render->getCurrentProgress() / render->getTargetProgress() * 100.,'f',2) + '%' : "")},
+    {"render_time",(render ? QString::number(render->getRenderedTime()) + "ms" : "-")},
+    {"date",QDate::currentDate().toString(tr("dd.MM.yyyy"))}
+};
+}
 
 void MainWindow::updateGUIfromSettings()
 {
@@ -42,6 +60,7 @@ void MainWindow::updateSettingsfromGUI()
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    description_format(default_description_format),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -117,7 +136,7 @@ void MainWindow::on_scene_selector_activated(int index)
     QVariant var = ui->scene_selector->itemData(index);
     if(index == 0){
         QString fileName = QFileDialog::getOpenFileName(this,
-            tr("Open Image"), "", tr("Scene file (*.xml)"));
+                                                        tr("Open Image"), "", tr("Scene file (*.xml)"));
 
         if(!fileName.isEmpty()){
             XMLSceneParser parser{};
@@ -132,4 +151,87 @@ void MainWindow::on_scene_selector_activated(int index)
     }
 
     updateGUIfromSettings();
+}
+
+QString MainWindow::generateDescription() const{
+    QString ans = description_format;
+    if(!ans.length()) return QString{};
+    auto info = get_description_info();
+    for(auto &it : info){
+        ans.replace("{"+it.first+"}", it.second);
+    }
+    return ans;
+}
+
+QImage MainWindow::generateFinalImage() const
+{
+    if(!render || !settings) return QImage();
+    QString description = generateDescription();
+    bool description_line = description.length() != 0;
+    const int descr_height = description_line ? 16 : 0;
+    int width=settings->getWidth(), height=settings->getHeight();
+    if(description_line){
+        width = std::max(512,width);
+        height = std::max(512, height + descr_height);
+    }
+
+    QImage new_img = QImage(width, height, QImage::Format::Format_RGB888);
+    QPainter painter(&new_img);
+    int cy = ((height - descr_height) - settings->getHeight())/2;
+    int cx = (width - settings->getWidth())/2;
+    painter.setBackground(QBrush(Qt::GlobalColor::black));
+    painter.drawImage(cx,cy, *render->getImage());
+    if(description_line){
+        painter.setBrush(QBrush(Qt::GlobalColor::white));
+        painter.setPen(QPen(Qt::GlobalColor::white,1));
+        painter.drawLine(0,height-descr_height,width,height-descr_height);
+        const int margin = 3;
+        QFont font = painter.font();
+        font.setPixelSize(descr_height-margin*2);
+        painter.setFont(font);
+        const QRect rect = QRect(margin, height-descr_height, width-margin*2, descr_height);
+        painter.drawText(rect,Qt::TextSingleLine | Qt::AlignVCenter,description);
+    }
+
+    return new_img;
+}
+
+void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
+{
+    ui->menuPicture->exec(mapToGlobal(pos));
+}
+
+void MainWindow::on_actionSave_triggered()
+{
+    QImage img = generateFinalImage();
+    QString image_path = QFileDialog::getSaveFileName(this,
+                                                     tr("Save File"), "",
+                                                     tr("JPEG (*.jpg *.jpeg);;PNG (*.png)" ));
+
+    img.save(image_path);
+}
+
+void MainWindow::on_actionCopy_in_buffer_triggered()
+{
+    QImage img = generateFinalImage();
+    if(img.width()){
+        QApplication::clipboard()->setImage(img, QClipboard::Clipboard);
+    }
+}
+
+void MainWindow::on_actionSettings_triggered()
+{
+    bool ok;
+    const std::vector<std::pair<QString,QString>> info = get_description_info();
+    QString label = tr("<p>Format of description line at the bottom of the pic. Fill it empty for plain image. " \
+                       "<p> Available parameters: <ul>");
+    for(auto &it : info){
+        label += "<li>" + it.first + "</li>";
+    }
+    label += tr("</ul>");
+
+    QString new_format = QInputDialog::getText(this, "Image description format",
+                          label,
+                          QLineEdit::Normal, description_format, &ok);
+    if(ok) description_format = new_format;
 }
