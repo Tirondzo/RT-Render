@@ -149,8 +149,8 @@ void RenderImpl::Worker::run(){
             //continue;
             int r = 0, g = 0, b = 0, a = 0;
 
-            NVector<uint64_t, 4> summ_squares{};
-            NVector<uint64_t, 4> summ_colors{};
+            //NVector<uint64_t, 4> summ_squares{};
+            //NVector<uint64_t, 4> summ_colors{};
             double rs = 0;
             double rn = 0;
             int samples{};
@@ -165,15 +165,15 @@ void RenderImpl::Worker::run(){
                 double dx = dDist(mt);
                 double dy = dDist(mt);
 
-                Vector3D xShift = camera->getRight() * ((x - width/2.0 + dx) / width * camera->getFov());
-                Vector3D yShift = camera->getUp() * ((y - height/2.0 + dy) / width * camera->getFov());
+                Vector3d xShift = camera->getRight() * ((x - width/2.0 + dx) / width * camera->getFov());
+                Vector3d yShift = camera->getUp() * ((y - height/2.0 + dy) / width * camera->getFov());
 
                 Ray ray(camera->getPosition(), camera->getDirection() + xShift + yShift);
 
                 Color color = integrator.trace(scene, ray, maxReflections, 0);
 
-                summ_squares += color * color;
-                summ_colors += color;
+                //summ_squares += color * color;
+                //summ_colors += color;
 
                 rs += (color.getR() * color.getR());
                 rn += color.getR();

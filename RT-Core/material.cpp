@@ -19,8 +19,8 @@ Ray Material::refract(const Intersection &intersection, const Ray &ray) const
     float etai = 1, etat = ior;
     // ior from, ior to
 
-    Vector3D Nrefr = intersection.getNormal();
-    double NdotI = Vector3D::dot(Nrefr, ray.getDirection());
+    Vector3d Nrefr = intersection.getNormal();
+    double NdotI = Nrefr.dot(ray.getDirection());
     if (NdotI < 0) {
         // we are outside the surface
         NdotI = -NdotI;
@@ -37,17 +37,17 @@ Ray Material::refract(const Intersection &intersection, const Ray &ray) const
     float k = 1 - eta * eta * (1 - NdotI * NdotI);
     if (k < 0) {
         // total internal reflection. There is no refraction in this case
-        Vector3D direction = ray.getDirection() - Nrefr * 2 * Vector3D::dot(ray.getDirection().normalize(), Nrefr);
+        Vector3d direction = ray.getDirection() - Nrefr * (2 * ray.getDirection().normalized().dot(Nrefr));
         return Ray(intersection.getPoint() + Nrefr * EPSILON, direction);
     }else {
-        Vector3D direction = ray.getDirection() * eta + Nrefr * (eta * NdotI - sqrtf(k));
+        Vector3d direction = ray.getDirection() * eta + Nrefr * (eta * NdotI - sqrtf(k));
         return Ray(intersection.getPoint() - Nrefr * EPSILON, direction);
     }
 }
 
 Ray Material::reflect(const Intersection &intersection, const Ray &ray) const
 {
-    Vector3D direction = ray.getDirection() - intersection.getNormal() * 2 * Vector3D::dot(ray.getDirection(), intersection.getNormal());
+    Vector3d direction = ray.getDirection() - intersection.getNormal() * (2 * ray.getDirection().dot(intersection.getNormal()));
     return Ray(intersection.getPoint() + intersection.getNormal() * EPSILON, direction);
 }
 
@@ -83,7 +83,7 @@ double Material::getIOR(double A, double B, double C, double D, double E, double
 double Material::getCoef(const Intersection &intersection, const Ray &ray, const Ray &newRay, float rand)
 {
     if(rand < kd){ //diffusive
-        //return abs(Vector3D::dot(newRay.getDirection(), intersection.getNormal()));
+        //return abs(Vector3d::dot(newRay.getDirection(), intersection.getNormal()));
         return reflectivity;
     }else if(rand < kd + ks){ //specullar
 
@@ -95,7 +95,7 @@ double Material::getCoef(const Intersection &intersection, const Ray &ray, const
 
 Ray Material::getNewRay(const Intersection &intersection, const Ray &ray, float rand_k)
 {
-    Vector3D N = intersection.getNormal();
+    Vector3d N = intersection.getNormal();
     if(rand_k < kd){ //diffusive
         double r1 = dDist(mt);
         double r2 = dDist(mt);
@@ -104,21 +104,22 @@ Ray Material::getNewRay(const Intersection &intersection, const Ray &ray, float 
         double cosTheta = sqrt(1-r2);
         double sinTheta = sqrt(1 - pow(cosTheta, 2));
 
-        Vector3D direction = Vector3D(sinTheta*cos(phi), sinTheta*sin(phi), cosTheta);
+        Vector3d direction = Vector3d(sinTheta*cos(phi), sinTheta*sin(phi), cosTheta);
 
         // gen basis
 
-        Vector3D Nt;
-        if (std::fabs(N.getX()) > std::fabs(N.getY()))
-            Nt = Vector3D(N.getZ(), 0, -N.getX()).normalize();
-        else Nt = Vector3D(0, -N.getZ(), N.getY()).normalize();
+        Vector3d Nt;
+        if (std::fabs(N.x()) > std::fabs(N.y()))
+            Nt = Vector3d(N.z(), 0, -N.x()).normalized();
+        else Nt = Vector3d(0, -N.z(), N.y()).normalized();
 
-        Vector3D Nb = Vector3D::cross(Nt, N);
+        Vector3d Nb = Nt.cross(N);
 
-        Vector3D translated(
-                    direction.getX() * Nb.getX() + direction.getY() * Nt.getX() + direction.getZ() * N.getX(),
-                    direction.getX() * Nb.getY() + direction.getY() * Nt.getY() + direction.getZ() * N.getY(),
-                    direction.getX() * Nb.getZ() + direction.getY() * Nt.getZ() + direction.getZ() * N.getZ());
+        // move generated vec to new basis
+
+        Matrix3d newBasis;
+        newBasis << Nb, Nt, N;
+        Vector3d translated = newBasis * direction;
 
 
         return Ray(intersection.getPoint() + intersection.getNormal() * EPSILON, translated);
@@ -129,7 +130,7 @@ Ray Material::getNewRay(const Intersection &intersection, const Ray &ray, float 
         double phi = 2 * M_PI * r1;
         double h = 2 * r2 - 1;
         double w = sqrt(1 - h*h);
-        Vector3D direction = Vector3D(sin(phi)*w, cos(phi)*w, h);
+        Vector3d direction = Vector3d(sin(phi)*w, cos(phi)*w, h);
         return Ray(intersection.getPoint() + intersection.getNormal() * EPSILON, direction);
         */
 
@@ -138,7 +139,7 @@ Ray Material::getNewRay(const Intersection &intersection, const Ray &ray, float 
     }else{ //transmittion
 
         float kr{};
-        float cosi = Vector3D::dot(ray.getDirection(), intersection.getNormal());
+        float cosi = ray.getDirection().dot(intersection.getNormal());
         float etai = 1, etat = ior;
         if (cosi > 0) { std::swap(etai, etat); }
         // Compute sini using Snell's law

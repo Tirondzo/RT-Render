@@ -1,5 +1,4 @@
 #include "camera.h"
-#include "vector3d.h"
 
 float Camera::getFov() const
 {
@@ -7,36 +6,36 @@ float Camera::getFov() const
 }
 
 
-Camera::Camera(Vector3D position, Vector3D lookAt, float fov, float focus, float focal) :
+Camera::Camera(const Vector3d position, const Vector3d lookAt, float fov, float focus, float focal) :
     position(position), lookAt(lookAt), fov(fov), focus(focus), focal(focal)
 {
-    direction = (lookAt - position).normalize();
-    up = Vector3D::cross(direction, Vector3D::cross(Vector3D(0.0f, 0.0f, 1.0f), direction)).normalize();
-    right = Vector3D::cross(up, direction).normalize();
+    direction = (lookAt - position).normalized();
+    up = direction.cross(Vector3d(0.0, 0.0, 1.0)).cross(direction).normalized();
+    right = up.cross(direction).normalized();
 }
 
 
-Vector3D& Camera::getLookAt()
+Vector3d& Camera::getLookAt()
 {
     return lookAt;
 }
 
-Vector3D& Camera::getUp()
+Vector3d& Camera::getUp()
 {
     return up;
 }
 
-Vector3D& Camera::getRight()
+Vector3d& Camera::getRight()
 {
     return right;
 }
 
-Vector3D& Camera::getPosition()
+Vector3d& Camera::getPosition()
 {
     return position;
 }
 
-Vector3D& Camera::getDirection()
+Vector3d& Camera::getDirection()
 {
     return direction;
 }

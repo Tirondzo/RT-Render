@@ -54,10 +54,10 @@ private:
         sscanf(str.toStdString().c_str(), "%d , %d , %d , %d", &r, &g, &b, &a);
         return Color(r,g,b,a);
     }
-    Vector3D parseVector(const QString &str) const{
+    Vector3d parseVector(const QString &str) const{
         double x{},y{},z{};
         sscanf(str.toStdString().c_str(), "%lf , %lf , %lf", &x, &y, &z);
-        return Vector3D(x,y,z);
+        return Vector3d(x,y,z);
     }
 
     RenderSettings* readScene(const QDomElement &rootElement) const{
@@ -158,7 +158,7 @@ private:
 
     Camera* readCamera(const QDomElement &element) const{
         QDomElement childElement;
-        Vector3D position, lookAt;
+        Vector3d position, lookAt;
         float fov = 1.f;
         float focus = 3.8f;
         float focal = 7.5f;
@@ -195,7 +195,7 @@ private:
             }else return nullptr;
 
             if(type == "plane"){
-                Vector3D center, normal;
+                Vector3d center, normal;
                 int w = -1, l = -1;
                 if(!(childElement = element.firstChildElement("center")).isNull()
                         && readAttributeAsVector(childElement, center, "val")){
@@ -209,7 +209,7 @@ private:
                 }
                 return new Plane(mat, center, normal, w, l);
             }else if(type == "sphere"){
-                Vector3D center;
+                Vector3d center;
                 float radius;
                 if(!(childElement = element.firstChildElement("center")).isNull()
                         && readAttributeAsVector(childElement, center, "val")){
@@ -263,7 +263,7 @@ private:
         }else return false;
         return true;
     }
-    bool readAttributeAsVector(const QDomElement &element, Vector3D &val, const QString &attr = "val") const{
+    bool readAttributeAsVector(const QDomElement &element, Vector3d &val, const QString &attr = "val") const{
         if(element.hasAttribute(attr)){
             val = parseVector(element.attribute(attr));
         }else return false;

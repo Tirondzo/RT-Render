@@ -1,7 +1,7 @@
 #include "sphere.h"
 #include <math.h>
 
-Sphere::Sphere(Material *material, Vector3D center, float radius) :
+Sphere::Sphere(Material *material, Vector3d center, float radius) :
     Object(material), center(center), radius(radius)
 {
 
@@ -9,12 +9,12 @@ Sphere::Sphere(Material *material, Vector3D center, float radius) :
 
 
 Intersection Sphere::intersect(const Ray &ray){
-    Vector3D dir = ray.getDirection();
-    Vector3D orig = ray.getOrigin();
+    Vector3d dir = ray.getDirection();
+    Vector3d orig = ray.getOrigin();
 
-    double a = Vector3D::dot(dir, dir);
-    double b = 2.0 * Vector3D::dot(dir, orig - center);
-    double c = Vector3D::dot(orig-center, orig-center) - pow(radius, 2);
+    double a = dir.dot(dir);
+    double b = 2.0 * dir.dot(orig - center);
+    double c = (orig-center).dot(orig-center) - pow(radius, 2);
 
 
     double discr = b*b - 4*a*c;
@@ -33,7 +33,7 @@ Intersection Sphere::intersect(const Ray &ray){
             dist = fmin(dist1, dist2);
         }
 
-        Vector3D point = orig + (dir*dist);
-        return Intersection(this, dist, point, (point - center).normalize(), true);
+        Vector3d point = orig + (dir*dist);
+        return Intersection(this, dist, point, (point - center).normalized(), true);
     }
 }

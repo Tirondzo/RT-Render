@@ -5,9 +5,10 @@ class Intersection;
 
 #include "color.h"
 #include "intersection.h"
-#include "vector3d.h"
 #include "ray.h"
 #include "randomly.h"
+#include <Eigen/Core>
+using namespace Eigen;
 
 class Material : protected Randomly
 {

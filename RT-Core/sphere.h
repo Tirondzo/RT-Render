@@ -6,11 +6,11 @@
 class Sphere : public Object
 {
 private:
-    Vector3D center;
+    Vector3d center;
     float radius;
 
 public:
-    Sphere(Material *material, Vector3D center, float radius);
+    Sphere(Material *material, Vector3d center, float radius);
 
     Intersection intersect(const Ray &ray);
 };

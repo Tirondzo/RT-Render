@@ -31,6 +31,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 DEPENDPATH += . ../RT-Core/
 INCLUDEPATH += ../RT-Core/
+INCLUDEPATH += $$PWD/../Dependencies/eigen-eigen-5a0156e40feb/
+# DEPENDPATH += $$PWD/../Dependencies/eigen-eigen-5a0156e40feb/
 
 SOURCES += \
         main.cpp \

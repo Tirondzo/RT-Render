@@ -5,7 +5,7 @@ float Intersection::getDistance() const
     return distance;
 }
 
-Vector3D Intersection::getPoint() const
+Vector3d Intersection::getPoint() const
 {
     return point;
 }
@@ -15,12 +15,12 @@ Object *Intersection::getObject() const
     return object;
 }
 
-Vector3D Intersection::getNormal() const
+Vector3d Intersection::getNormal() const
 {
     return normal;
 }
 
-Intersection::Intersection(Object *object, float distance, Vector3D point, Vector3D normal, bool exists) :
+Intersection::Intersection(Object *object, float distance, Vector3d point, Vector3d normal, bool exists) :
     object(object), distance(distance), point(point), normal(normal), exists(exists)
 {
 

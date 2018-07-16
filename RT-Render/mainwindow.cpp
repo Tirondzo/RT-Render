@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "render.h"
-#include "vector3d.h"
 #include "integrator.h"
 #include "plane.h"
 #include "sphere.h"

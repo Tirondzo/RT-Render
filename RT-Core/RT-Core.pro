@@ -21,18 +21,18 @@ CONFIG += с++11
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
+# INCLUDEPATH += /usr/local/Cellar/eigen/3.3.4/include/eigen3/
+INCLUDEPATH += $$PWD/../Dependencies/eigen-eigen-5a0156e40feb/
+# DEPENDPATH += $$PWD/../Dependencies/eigen-eigen-5a0156e40feb/
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
 SOURCES += \
         ray.cpp \
-    vector3d.cpp \
     integrator.cpp \
     color.cpp \
-    nvector.cpp \
     scene.cpp \
     object.cpp \
     intersection.cpp \
@@ -44,10 +44,8 @@ SOURCES += \
 
 HEADERS += \
         ray.h \
-    vector3d.h \
     integrator.h \
     color.h \
-    nvector.h \
     scene.h \
     object.h \
     intersection.h \

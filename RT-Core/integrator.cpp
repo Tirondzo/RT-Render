@@ -1,6 +1,5 @@
 #include "integrator.h"
 #include "intersection.h"
-#include "vector3d.h"
 
 #include <math.h>
 #include <cstdlib>
@@ -31,7 +30,7 @@ Color Integrator::trace(Scene *scene, const Ray &ray, int maxDepth, int depth)
     Ray newRay = mat->getNewRay(intersection, ray, rand);
     Color mat_col = object->getMaterial()->getColor();
 
-    Color traced_col = trace(scene, newRay, maxDepth, depth+1) * mat_col;
+    Color traced_col = (trace(scene, newRay, maxDepth, depth+1).array() * mat_col.array()).matrix();
 
-    return (traced_col * mat->getCoef(intersection, ray, newRay, rand))  / 255.0;
+    return Color(((traced_col.cast<double>() * mat->getCoef(intersection, ray, newRay, rand))  / 255.0).cast<int>());
 }

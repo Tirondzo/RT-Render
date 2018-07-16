@@ -6,12 +6,12 @@
 class Plane : public Object
 {
 private:
-    Vector3D center, normal;
-    Vector3D right, forward;
+    Vector3d center, normal;
+    Vector3d right, forward;
     double w,l;
 
 public:
-    Plane(Material *material, Vector3D center, Vector3D normal, double w = -1, double l = -1);
+    Plane(Material *material, Vector3d center, Vector3d normal, double w = -1, double l = -1);
 
     Intersection intersect(const Ray &ray);
 };

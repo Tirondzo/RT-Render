@@ -1,17 +1,18 @@
 #ifndef RAY_H
 #define RAY_H
 
-#include "vector3d.h"
+#include <Eigen/Core>
+using namespace Eigen;
 
 class Ray
 {
-    Vector3D origin, direction;
+    Vector3d origin, direction;
 public:
-    Ray(const Vector3D &origin, const Vector3D &direction) : origin(origin), direction(direction.normalize()) {}
+    Ray(const Vector3d &origin, const Vector3d &direction) : origin(origin), direction(direction.normalized()) {}
     Ray() : origin(), direction() {}
 
-    Vector3D getOrigin() const;
-    Vector3D getDirection() const;
+    Vector3d getOrigin() const;
+    Vector3d getDirection() const;
 };
 
 #endif // RAY_H

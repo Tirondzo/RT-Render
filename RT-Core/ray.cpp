@@ -1,4 +1,4 @@
 #include "ray.h"
 
-Vector3D Ray::getDirection() const { return direction; }
-Vector3D Ray::getOrigin() const { return origin; }
+Vector3d Ray::getDirection() const { return direction; }
+Vector3d Ray::getOrigin() const { return origin; }
