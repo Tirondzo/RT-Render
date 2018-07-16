@@ -2,7 +2,6 @@
 #define SCENE_H
 
 #include "color.h"
-#include <vector>
 #include "object.h"
 #include "intersection.h"
 
@@ -11,10 +10,10 @@ class Scene
     Color ambient;
     float gamma;
 
-    std::vector<Object *> objects;
+    std::vector<Object *, Eigen::aligned_allocator<Object*>> objects;
 
 public:
-    Scene(Color ambient = Color(0,0,0), float gamma = .1f) : ambient(ambient), gamma(gamma), objects() {}
+    Scene(const Color &ambient = Color(0,0,0), float gamma = .1f) : ambient(ambient), gamma(gamma), objects() {}
     Color getAmbient() const;
     void setAmbient(const Color &value);
     float getGamma() const;

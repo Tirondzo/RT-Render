@@ -101,16 +101,8 @@ bool RenderImpl::Counter::getNextPixelGroup(int *rx, int *ry, int count){
     *rx = x;
     *ry = y;
     bool ret = x < width && y < height;
-    for(int i = 0; i < count; i++){
-        x++;
-        if(x >= width){
-            x = 0;
-            y++;
-        }
-        if(y >= height){
-            break;
-        }
-    }
+    y += (x+count)/width;
+    x = (x+count)%width;
     mutex.unlock();
     return ret;
 }

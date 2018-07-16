@@ -205,7 +205,7 @@ void MainWindow::on_actionSave_triggered()
     QImage img = generateFinalImage();
     QString image_path = QFileDialog::getSaveFileName(this,
                                                      tr("Save File"), "",
-                                                     tr("JPEG (*.jpg *.jpeg);;PNG (*.png)" ));
+                                                     tr("PNG (*.png);;JPEG (*.jpg *.jpeg)" ));
 
     img.save(image_path);
 }
